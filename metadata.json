@@ -1,0 +1,6 @@
+{
+  "name": "AFK Minecraft Bot Panel",
+  "description": "An elegant, responsive web panel to manage, launch, stop, and monitor Minecraft Java and Bedrock AFK bots.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

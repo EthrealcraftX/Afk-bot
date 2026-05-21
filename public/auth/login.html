@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - MC-AFK Controller Panel</title>
+    <!-- Favicon: single correct path -->
+    <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
+    <!-- FontAwesome & Custom styling -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+    <div class="auth-split-wrapper" id="authBox">
+        
+        <!-- Left Showcase Side -->
+        <div class="auth-branding-panel">
+            <div class="branding-header">
+                <div class="branding-logo">
+                    <img src="../assets/minecraft-icon.png" alt="Minecraft Logo">
+                    <span>MC-AFK Panel</span>
+                </div>
+                <div class="branding-promo-text">
+                    <h2>Manage automatic AFK bot companions in real time</h2>
+                    <p>Keep your farms, resources, and player queues alive 24/7 without worrying about server idle kicking.</p>
+                </div>
+            </div>
+
+            <!-- Features Showcase -->
+            <div class="branding-features">
+                <div class="feature-item">
+                    <div class="feature-icon-wrapper">
+                        <i class="fa-solid fa-mug-hot"></i>
+                    </div>
+                    <div class="feature-info">
+                        <h4>Java & Bedrock Native Proxies</h4>
+                        <p>Fully compliant with official Raknet Bedrock wrappers and Java protocols.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon-wrapper">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                    </div>
+                    <div class="feature-info">
+                        <h4>Active Anti-Kick Rotators</h4>
+                        <p>Bypass common AFK detectors using automated dynamic movements and actions.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon-wrapper">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <div class="feature-info">
+                        <h4>Persistent Live Console Logs</h4>
+                        <p>Real-time terminal reporting, tracking events even when you close the dashboard.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Indicator Stack -->
+            <div class="branding-mascots-preview">
+                <div class="mini-avatar-stack">
+                    <img src="../assets/steve_mascot.png" alt="Steve Companion">
+                    <img src="../assets/alex_mascot.png" alt="Alex Companion">
+                </div>
+                <div>
+                    <p><span class="pulse-bullet"></span> Companion bots online & running proxy routines</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Login Form Side -->
+        <div class="auth-form-panel">
+            <div class="auth-form-header">
+                <div class="auth-form-title">Welcome back</div>
+                <div class="auth-form-subtitle">Enter your credentials to control live companion sessions</div>
+            </div>
+
+            <!-- Signup success notice banner if redirected -->
+            <div id="signupSuccessAlert" style="display:none; color: #00ff88; background: rgba(0, 255, 136, 0.08); border: 1px solid rgba(0, 255, 136, 0.25); padding: 10px 14px; border-radius: 10px; margin-bottom: 20px; font-size: 13px; font-weight: 500;">
+                <i class="fa-regular fa-circle-check" style="margin-right: 6px;"></i> Account successfully created! Login below.
+            </div>
+
+            <!-- Dynamic Error Message Alert -->
+            <div id="errorMessage">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span id="errorText"></span>
+            </div>
+
+            <!-- Main Auth Form -->
+            <form class="auth-form" id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-container">
+                        <i class="fa-solid fa-user input-icon"></i>
+                        <input type="text" id="username" placeholder="Minecraft Admin" required autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-container">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility">
+                            <i class="fa-solid fa-eye" id="passwordEyeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="auth-submit-btn" id="submitBtn">
+                    <span class="btn-spinner" id="btnSpinner"></span>
+                    <span>Sign In</span>
+                    <i class="fa-solid fa-arrow-right" id="btnChevron"></i>
+                </button>
+
+                <!-- Guest access notice -->
+                <div class="guest-access-infotip">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <p><strong>Public/Guest access enabled!</strong> You can search, explore, and view existing bots without a password.</p>
+                </div>
+
+                <div class="auth-link-container">
+                    Don't have an account? 
+                    <a href="signup.html" class="auth-link">Akount yaratish / Sign Up</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Check for signupSuccess query parameter
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('signupSuccess') === 'true') {
+                const successAlert = document.getElementById('signupSuccessAlert');
+                if (successAlert) successAlert.style.display = 'block';
+            }
+        });
+
+        // Toggle password visibility function
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('passwordEyeIcon');
+            if (passwordInput && eyeIcon) {
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    eyeIcon.className = 'fa-solid fa-eye-slash';
+                } else {
+                    passwordInput.type = 'password';
+                    eyeIcon.className = 'fa-solid fa-eye';
+                }
+            }
+        }
+
+        // Handle Form Submission with smooth states
+        async function login() {
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const errorMessage = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnSpinner = document.getElementById('btnSpinner');
+            const btnChevron = document.getElementById('btnChevron');
+
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+
+            // Trigger visual loading state
+            if (submitBtn && btnSpinner && btnChevron) {
+                submitBtn.disabled = true;
+                btnSpinner.style.display = 'inline-block';
+                btnChevron.style.display = 'none';
+            }
+            if (errorMessage) errorMessage.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    localStorage.setItem('token', data.token); // Store authorization token
+                    window.location.href = '/'; // Redirect dynamically to dashboard lobby
+                } else {
+                    showFormError(data.error || 'Invalid credentials or login failed');
+                }
+            } catch (err) {
+                console.error('Login dynamic error:', err);
+                showFormError('Network error connecting to proxy router. Please try again.');
+            } finally {
+                // Restore submit state if login did not redirect
+                if (submitBtn && btnSpinner && btnChevron) {
+                    submitBtn.disabled = false;
+                    btnSpinner.style.display = 'none';
+                    btnChevron.style.display = 'inline-block';
+                }
+            }
+        }
+
+        function showFormError(msg) {
+            const errorMessage = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            if (errorMessage && errorText) {
+                errorText.textContent = msg;
+                errorMessage.style.display = 'flex';
+                // Add minor wiggle alert shake
+                const authBox = document.getElementById('authBox');
+                if (authBox) {
+                    authBox.style.animation = 'none';
+                    authBox.offsetHeight; // Force reflow trigger
+                    authBox.style.animation = 'authShake 0.4s ease';
+                }
+            }
+        }
+
+        // Form callback hookup
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await login();
+        });
+    </script>
+
+    <!-- Minor error shake keyframe helper -->
+    <style>
+        @keyframes authShake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+    </style>
+</body>
+</html>

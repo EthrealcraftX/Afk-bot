@@ -1,0 +1,25 @@
+{
+  "project_1779331483748_fyf4w": {
+    "host": "Zenthero.aternos.me",
+    "port": 50766,
+    "version": "1.16.5",
+    "type": "java",
+    "movementInterval": 5000,
+    "reconnectHours": 2,
+    "usernameFile": "usernames.txt",
+    "actions": [
+      "jump",
+      "moveForward",
+      "moveBackward",
+      "strafeLeft",
+      "strafeRight",
+      "lookAround",
+      "attackMobs"
+    ],
+    "status": "stopped",
+    "owner": "admin",
+    "createdAt": "2026-05-21T02:44:43.753Z",
+    "startedAt": "2026-05-21T02:47:35.601Z",
+    "stoppedAt": "2026-05-21T03:05:20.867Z"
+  }
+}

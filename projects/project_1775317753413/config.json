@@ -1,0 +1,21 @@
+{
+  "host": "Katta-server-go.aternos.me",
+  "port": 61450,
+  "version": "1.17.40",
+  "type": "bedrock",
+  "movementInterval": 5000,
+  "reconnectHours": 2,
+  "usernameFile": "usernames.txt",
+  "actions": [
+    "jump",
+    "moveForward",
+    "moveBackward",
+    "strafeLeft",
+    "strafeRight",
+    "lookAround",
+    "attackMobs"
+  ],
+  "status": "stopped",
+  "owner": "MultiMax",
+  "createdAt": "2026-04-04T15:49:13.414Z"
+}

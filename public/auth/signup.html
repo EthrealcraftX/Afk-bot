@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - MC-AFK Controller Panel</title>
+    <!-- Favicon: single correct path -->
+    <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
+    <!-- FontAwesome & Custom styling -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+    <div class="auth-split-wrapper" id="authBox">
+        
+        <!-- Left Showcase Side -->
+        <div class="auth-branding-panel">
+            <div class="branding-header">
+                <div class="branding-logo">
+                    <img src="../assets/minecraft-icon.png" alt="Minecraft Logo">
+                    <span>MC-AFK Panel</span>
+                </div>
+                <div class="branding-promo-text">
+                    <h2>Host automated AFK bot companions in real-time</h2>
+                    <p>Unlock custom parameters to keep inventories syncing, experience running, and anti-afk rotations executing flawlessly.</p>
+                </div>
+            </div>
+
+            <!-- Features Showcase -->
+            <div class="branding-features">
+                <div class="feature-item">
+                    <div class="feature-icon-wrapper">
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <div class="feature-info">
+                        <h4>Create Custom Admin Accounts</h4>
+                        <p>Fully secure your server list access with personalized password credentials.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon-wrapper">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div class="feature-info">
+                        <h4>Multi-Host Protection</h4>
+                        <p>Run separate background tasks safely with completely isolated worker structures.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon-wrapper">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div class="feature-info">
+                        <h4>Ultra-Fast Response Proxies</h4>
+                        <p>Keep connection loops live even during low physical bandwidth cycles.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Indicator Stack -->
+            <div class="branding-mascots-preview">
+                <div class="mini-avatar-stack">
+                    <img src="../assets/steve_mascot.png" alt="Steve Companion">
+                    <img src="../assets/alex_mascot.png" alt="Alex Companion">
+                </div>
+                <div>
+                    <p><span class="pulse-bullet"></span> Join active administrators managing worker loops</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sign Up Form Side -->
+        <div class="auth-form-panel">
+            <div class="auth-form-header">
+                <div class="auth-form-title">Akount yaratish</div>
+                <div class="auth-form-subtitle">Create your control panel credentials to sync companion proxies</div>
+            </div>
+
+            <!-- Dynamic Error Message Alert (matches login.html) -->
+            <div id="errorMessage">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span id="errorText"></span>
+            </div>
+
+            <!-- Main Auth Form -->
+            <form class="auth-form" id="signupForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-container">
+                        <i class="fa-solid fa-user input-icon"></i>
+                        <input type="text" id="username" placeholder="Minecraft Admin" required minlength="4" autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-container">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" id="password" placeholder="Min. 6 characters" required minlength="6" autocomplete="new-password">
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password', 'passwordEyeIcon')" aria-label="Toggle password visibility">
+                            <i class="fa-solid fa-eye" id="passwordEyeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <div class="input-container">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" id="confirmPassword" placeholder="Repeat password" required minlength="6" autocomplete="new-password">
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('confirmPassword', 'confirmEyeIcon')" aria-label="Toggle password visibility">
+                            <i class="fa-solid fa-eye" id="confirmEyeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="auth-submit-btn" id="submitBtn">
+                    <span>Sign Up</span>
+                    <i class="fa-solid fa-user-plus"></i>
+                </button>
+
+                <div class="auth-link-container">
+                    Already have an account? 
+                    <a href="login.html" class="auth-link">Akount bormi? Login</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Password toggle helper -->
+    <script>
+        function togglePasswordVisibility(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const eyeIcon = document.getElementById(iconId);
+            if (passwordInput && eyeIcon) {
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    eyeIcon.className = 'fa-solid fa-eye-slash';
+                } else {
+                    passwordInput.type = 'password';
+                    eyeIcon.className = 'fa-solid fa-eye';
+                }
+            }
+        }
+    </script>
+
+    <!-- Wire up the elegant form logic and signup handler -->
+    <script src="signup.js"></script>
+
+    <!-- Shake error helper -->
+    <style>
+        @keyframes authShake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+    </style>
+</body>
+</html>

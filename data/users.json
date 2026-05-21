@@ -1,0 +1,232 @@
+{
+  "MultiMax": {
+    "projects": {
+      "project_1775317753413": {
+        "host": "Katta-server-go.aternos.me",
+        "port": 61450,
+        "version": "1.17.40",
+        "type": "bedrock",
+        "movementInterval": 5000,
+        "reconnectHours": 2,
+        "usernameFile": "usernames.txt",
+        "actions": [
+          "jump",
+          "moveForward",
+          "moveBackward",
+          "strafeLeft",
+          "strafeRight",
+          "lookAround",
+          "attackMobs"
+        ],
+        "status": "stopped",
+        "owner": "MultiMax",
+        "createdAt": "2026-04-04T15:49:13.414Z",
+        "startedAt": "2026-04-04T15:51:04.121Z",
+        "stoppedAt": "2026-04-04T15:51:34.522Z"
+      }
+    },
+    "createdAt": "2026-01-03T09:43:03.160Z",
+    "passwordHash": "$2a$10$I9tvbCCQXtrEKyMtsyUXK.KQnluxSYEePJyBtkqQ5v7BIkaP3AY3u"
+  },
+  "test_1767448544070": {
+    "passwordHash": "$2b$10$bVWlSCA0ZJ1CaxP2t7rjKuTW7VTHbmnpuOzOq/IvZ3dKH61zQ23bm",
+    "projects": {
+      "project_1767448544224": {
+        "host": "127.0.0.1",
+        "port": 25565,
+        "version": "1.16.5",
+        "type": "java",
+        "movementInterval": 5000,
+        "reconnectHours": 2,
+        "usernameFile": "usernames.txt",
+        "actions": [
+          "jump",
+          "moveForward",
+          "moveBackward",
+          "strafeLeft",
+          "strafeRight",
+          "lookAround",
+          "attackMobs"
+        ],
+        "status": "stopped",
+        "owner": "test_1767448544070",
+        "createdAt": "2026-01-03T13:55:44.225Z"
+      }
+    },
+    "createdAt": "2026-01-03T13:55:44.153Z"
+  },
+  "testglobal1767448571986": {
+    "passwordHash": "$2b$10$Trg9kFhgqml3EDgA1rxn6uJIxIztErXpOMFKJeWOOPzwWybyA5bfe",
+    "projects": {
+      "project_1767448572134": {
+        "host": "127.0.0.1",
+        "port": 25565,
+        "version": "1.16.5",
+        "type": "java",
+        "movementInterval": 5000,
+        "reconnectHours": 2,
+        "usernameFile": "usernames.txt",
+        "actions": [
+          "jump",
+          "moveForward",
+          "moveBackward",
+          "strafeLeft",
+          "strafeRight",
+          "lookAround",
+          "attackMobs"
+        ],
+        "status": "stopped",
+        "owner": "testglobal1767448571986",
+        "createdAt": "2026-01-03T13:56:12.134Z"
+      }
+    },
+    "createdAt": "2026-01-03T13:56:12.065Z"
+  },
+  "testglb1767448789715": {
+    "passwordHash": "$2b$10$kpN5B38G8OrlPLveR5SFMuBSDiyA.g8tKx0CSIWA4p9mg3t38Ouf6",
+    "projects": {
+      "project_1767448789891": {
+        "host": "127.0.0.1",
+        "port": 25565,
+        "version": "1.16.5",
+        "type": "java",
+        "movementInterval": 5000,
+        "reconnectHours": 2,
+        "usernameFile": "usernames.txt",
+        "actions": [
+          "jump",
+          "moveForward",
+          "moveBackward",
+          "strafeLeft",
+          "strafeRight",
+          "lookAround",
+          "attackMobs"
+        ],
+        "status": "stopped",
+        "owner": "testglb1767448789715",
+        "createdAt": "2026-01-03T13:59:49.892Z"
+      }
+    },
+    "createdAt": "2026-01-03T13:59:49.821Z"
+  },
+  "test_1767449124340": {
+    "passwordHash": "$2b$10$xfIwv2Ozqp9Arpou2esuwOX/S5WL1c.mBUtkwZLW09p1Wahik/FIW",
+    "projects": {
+      "project_1767449124525": {
+        "host": "127.0.0.1",
+        "port": 25565,
+        "version": "1.16.5",
+        "type": "java",
+        "movementInterval": 5000,
+        "reconnectHours": 2,
+        "usernameFile": "usernames.txt",
+        "actions": [
+          "jump",
+          "moveForward",
+          "moveBackward",
+          "strafeLeft",
+          "strafeRight",
+          "lookAround",
+          "attackMobs"
+        ],
+        "status": "stopped",
+        "owner": "test_1767449124340",
+        "createdAt": "2026-01-03T14:05:24.525Z"
+      }
+    },
+    "createdAt": "2026-01-03T14:05:24.448Z"
+  },
+  "httpuser": {
+    "passwordHash": "$2b$10$rkC16bvuazkVcT8xJy4CsugQy9HZUrZdnQLIP.bSOTDgvQy2ejWni",
+    "projects": {
+      "project_1767449155858": {
+        "host": "127.0.0.1",
+        "port": 25565,
+        "version": "1.16.5",
+        "type": "java",
+        "movementInterval": 5000,
+        "reconnectHours": 2,
+        "usernameFile": "usernames.txt",
+        "actions": [
+          "jump",
+          "moveForward",
+          "moveBackward",
+          "strafeLeft",
+          "strafeRight",
+          "lookAround",
+          "attackMobs"
+        ],
+        "status": "stopped",
+        "owner": "httpuser",
+        "createdAt": "2026-01-03T14:05:55.858Z"
+      }
+    },
+    "createdAt": "2026-01-03T14:05:55.788Z"
+  },
+  "test_1767449449638": {
+    "passwordHash": "$2b$10$PKm0Xw0SmcORTGuzHezEA.QdxebDOjSIEkZBM68tYUMJuP2AsWjM6",
+    "projects": {
+      "project_1767449449789": {
+        "host": "127.0.0.1",
+        "port": 25565,
+        "version": "1.16.5",
+        "type": "java",
+        "movementInterval": 5000,
+        "reconnectHours": 2,
+        "usernameFile": "usernames.txt",
+        "actions": [
+          "jump",
+          "moveForward",
+          "moveBackward",
+          "strafeLeft",
+          "strafeRight",
+          "lookAround",
+          "attackMobs"
+        ],
+        "status": "stopped",
+        "owner": "test_1767449449638",
+        "createdAt": "2026-01-03T14:10:49.789Z"
+      }
+    },
+    "createdAt": "2026-01-03T14:10:49.717Z"
+  },
+  "MultiMax123": {
+    "passwordHash": "$2b$10$XeHXxdwH4OBldqT7G2ucUeoi003t8DNKlDMzp0ZksXqI.kxkFWMpu",
+    "projects": {},
+    "createdAt": "2026-02-18T08:42:22.130Z"
+  },
+  "guest": {
+    "passwordHash": "",
+    "projects": {},
+    "createdAt": "2026-05-21T02:11:20.013Z"
+  },
+  "admin": {
+    "passwordHash": "$2b$10$2OwjnQfqjOQMPxgqSFhe9Or5PmV8cEyvjXOBzXbfSrxjpazT8WDOO",
+    "projects": {
+      "project_1779331483748_fyf4w": {
+        "host": "Zenthero.aternos.me",
+        "port": 50766,
+        "version": "1.16.5",
+        "type": "java",
+        "movementInterval": 5000,
+        "reconnectHours": 2,
+        "usernameFile": "usernames.txt",
+        "actions": [
+          "jump",
+          "moveForward",
+          "moveBackward",
+          "strafeLeft",
+          "strafeRight",
+          "lookAround",
+          "attackMobs"
+        ],
+        "status": "stopped",
+        "owner": "admin",
+        "createdAt": "2026-05-21T02:44:43.753Z",
+        "startedAt": "2026-05-21T02:47:35.601Z",
+        "stoppedAt": "2026-05-21T03:05:20.867Z"
+      }
+    },
+    "createdAt": "2026-05-21T02:11:20.082Z"
+  }
+}

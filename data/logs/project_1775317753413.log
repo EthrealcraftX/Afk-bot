@@ -1,0 +1,60 @@
+[2026-04-04T17:32:07.674Z] [project_1775317753413] stdout: 🆕 Bot yaratildi: VoidWalkerB
+
+[2026-04-04T17:32:09.135Z] [project_1775317753413] stdout: ⚠️ Xatolik: Ping timed out
+
+[2026-04-04T17:32:09.138Z] [project_1775317753413] stderr: RakTimeout [Error]: Ping timed out
+    at C:\Users\Администратор\Desktop\My projects\Afk-bot\node_modules\bedrock-protocol\src\rak.js:75:13
+    at waitFor (C:\Users\Администратор\Desktop\My projects\Afk-bot\node_modules\bedrock-protocol\src\datatypes\util.js:30:32)
+    at async ping (C:\Users\Администратор\Desktop\My projects\Afk-bot\node_modules\bedrock-protocol\src\createClient.js:95:41)
+
+[2026-04-04T17:32:09.148Z] [project_1775317753413] stdout: 🔁 Reconnect attempt 1, retrying in 5s...
+
+[2026-04-04T17:32:14.146Z] [project_1775317753413] stdout: 🆕 Bot yaratildi: EndCityB
+
+[2026-04-04T17:32:15.485Z] [project_1775317753413] stdout: ⚠️ Xatolik: Ping timed out
+
+[2026-04-04T17:32:15.489Z] [project_1775317753413] stderr: RakTimeout [Error]: Ping timed out
+    at C:\Users\Администратор\Desktop\My projects\Afk-bot\node_modules\bedrock-protocol\src\rak.js:75:13
+    at waitFor (C:\Users\Администратор\Desktop\My projects\Afk-bot\node_modules\bedrock-protocol\src\datatypes\util.js:30:32)
+    at async ping (C:\Users\Администратор\Desktop\My projects\Afk-bot\node_modules\bedrock-protocol\src\createClient.js:95:41)
+
+[2026-04-04T17:32:15.491Z] [project_1775317753413] stdout: 🔁 Reconnect attempt 2, retrying in 10s...
+
+[2026-04-04T17:32:18.125Z] [project_1775317753413] stderr: Connection timed out to Katta-server-go.aternos.me:61450 after 10000ms
+
+[2026-04-04T17:32:18.128Z] [project_1775317753413] stdout: 🔁 Reconnect attempt 3, retrying in 20s...
+
+[2026-04-04T17:32:24.477Z] [project_1775317753413] stderr: Connection timed out to Katta-server-go.aternos.me:61450 after 10000ms
+
+[2026-04-04T17:32:24.480Z] [project_1775317753413] stdout: 🔁 Reconnect attempt 4, retrying in 40s...
+
+[2026-04-04T17:32:25.495Z] [project_1775317753413] stdout: 🆕 Bot yaratildi: LecternBookB
+
+[2026-04-04T17:32:26.932Z] [project_1775317753413] stdout: ⚠️ Xatolik: Ping timed out
+
+[2026-04-04T17:32:26.935Z] [project_1775317753413] stderr: RakTimeout [Error]: Ping timed out
+    at C:\Users\Администратор\Desktop\My projects\Afk-bot\node_modules\bedrock-protocol\src\rak.js:75:13
+    at waitFor (C:\Users\Администратор\Desktop\My projects\Afk-bot\node_modules\bedrock-protocol\src\datatypes\util.js:30:32)
+    at async ping (C:\Users\Администратор\Desktop\My projects\Afk-bot\node_modules\bedrock-protocol\src\createClient.js:95:41)
+
+[2026-04-04T17:32:26.937Z] [project_1775317753413] stdout: 🔁 Reconnect attempt 5, retrying in 80s...
+
+[2026-04-04T17:32:35.924Z] [project_1775317753413] stderr: Connection timed out to Katta-server-go.aternos.me:61450 after 10000ms
+
+[2026-04-04T17:32:35.927Z] [project_1775317753413] stdout: 🔁 Reconnect attempt 6, retrying in 160s...
+
+[2026-04-04T17:32:38.137Z] [project_1775317753413] stdout: 🆕 Bot yaratildi: PillagerB
+
+[2026-04-04T17:32:39.511Z] [project_1775317753413] stdout: ⚠️ Xatolik: Ping timed out
+
+[2026-04-04T17:32:39.514Z] [project_1775317753413] stderr: RakTimeout [Error]: Ping timed out
+    at C:\Users\Администратор\Desktop\My projects\Afk-bot\node_modules\bedrock-protocol\src\rak.js:75:13
+    at waitFor (C:\Users\Администратор\Desktop\My projects\Afk-bot\node_modules\bedrock-protocol\src\datatypes\util.js:30:32)
+    at async ping (C:\Users\Администратор\Desktop\My projects\Afk-bot\node_modules\bedrock-protocol\src\createClient.js:95:41)
+
+[2026-04-04T17:32:39.516Z] [project_1775317753413] stdout: 🔁 Reconnect attempt 6, retrying in 160s...
+
+[2026-04-04T17:32:48.507Z] [project_1775317753413] stderr: Connection timed out to Katta-server-go.aternos.me:61450 after 10000ms
+
+[2026-04-04T17:32:48.509Z] [project_1775317753413] stdout: 🔁 Reconnect attempt 6, retrying in 160s...
+
