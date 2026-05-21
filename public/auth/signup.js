@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Yuklash holatini ko'rsatish
       const submitBtn = signupForm.querySelector('button[type="submit"]');
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:8px;"></i> Acc yaratilmoqda...';
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:8px;"></i> Creating account...';
 
       // APIga so'rov yuborish
       const response = await fetch('/api/auth/signup', {

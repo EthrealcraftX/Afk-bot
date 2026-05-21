@@ -7,12 +7,12 @@ if (!process.env.JWT_SECRET) {
 
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
 const apiRoutes = require('./api/routes');
+const connectDB = require('./api/db');
 const { initialize } = require('./api/api');
 
 const app = express();
-const PORT = 3000; // Enforced port 3000 for AI Studio environment (PORT cannot be overridden)
+const PORT = 3000; // Enforced port 3000 for AI Studio environment
 
 // Middleware
 app.use(express.json());
@@ -67,10 +67,13 @@ app.use((err, req, res, next) => {
 });
 
 // Initialize and start server
-function startServer() {
+async function startServer() {
   try {
+    // Connect to MongoDB
+    await connectDB();
+
     // Initialize database and directories
-    initialize();
+    await initialize();
 
     // Start the server
     app.listen(PORT, () => {
@@ -94,10 +97,6 @@ function startServer() {
 // Handle graceful shutdown
 process.on('SIGTERM', () => {
   console.log('Shutting down gracefully...');
-  
-  // Stop all running processes (if needed)
-  // ...
-  
   process.exit(0);
 });
 

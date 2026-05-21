@@ -1,1 +1,81 @@
-"<h1>404 - Sahifa topilmadi</h1>" 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Block Not Found</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 24px;
+            box-sizing: border-box;
+            background-color: var(--bg-primary);
+        }
+
+        .error-card {
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            padding: 48px 32px;
+        }
+
+        .error-icon {
+            font-size: 4rem;
+            color: var(--accent-red);
+            margin-bottom: 24px;
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+            animation: pulseGlow 2s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            from {
+                text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+                transform: scale(0.98);
+            }
+            to {
+                text-shadow: 0 0 25px rgba(239, 68, 68, 0.6);
+                transform: scale(1.02);
+            }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: #ffffff;
+            letter-spacing: -0.03em;
+        }
+
+        p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        .btn {
+            font-size: 1rem;
+            padding: 12px 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-card glass-card">
+        <div class="error-icon">
+            <i class="fa-solid fa-cube"></i>
+        </div>
+        <h1>404</h1>
+        <p>The block you are looking for does not exist in this world.</p>
+        <button class="btn btn-primary" onclick="window.location.href='/'">
+            <i class="fa-solid fa-house"></i> Return to Home
+        </button>
+    </div>
+</body>
+</html>

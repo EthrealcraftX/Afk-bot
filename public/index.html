@@ -3,158 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft Server Manager</title>
+    <title>MC-AFK Bot Panel — Dashboard</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="index.css">
-    <!-- Favicon: single correct path (public folder is served as root) -->
     <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="app-container">
+        <!-- Premium Glassmorphic Header -->
         <header class="app-header">
             <div class="header-content">
-                <h1 class="app-title">
-                    <img src="assets/minecraft-icon.png" alt="Minecraft" class="title-icon">
-                    Minecraft Server Manager
-                </h1>
-                <div class="header-actions">
-                    <button class="btn create-btn" onclick="window.location.href='/create'">
-                        <i class="fa fa-plus" aria-hidden="true"></i> Server Qoshish
+                <a href="/" class="logo">
+                    <i class="fa-solid fa-terminal"></i>
+                    <span>MC-AFK Bot Panel</span>
+                </a>
+                <div class="header-nav">
+                    <button class="btn btn-primary" onclick="window.location.href='/create'">
+                        <i class="fa-solid fa-plus"></i> New Server
                     </button>
-                    <button class="btn logout-btn" id="logoutBtn">
-                        <i class="fa fa-right-from-bracket" aria-hidden="true"></i> Logout
+                    <button class="btn btn-ghost" id="logoutBtn">
+                        <i class="fa-solid fa-right-from-bracket"></i> Logout
                     </button>
                 </div>
             </div>
         </header>
 
         <main class="app-main">
-            <!-- Top Hero Banner / Steve & Alex Head Section -->
-            <div class="minecraft-banner">
-                <div class="banner-text">
-                    <h2><i class="fa-solid fa-cubes"></i> MC-AFK CONTROLLER PANEL</h2>
-                    <p>Manage and run automatic Minecraft AFK companion bots with active anti-kick rotators.</p>
+            <!-- Modern Real-Time Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <span class="label">Total Servers</span>
+                    <span class="value" id="statTotalServers">0</span>
                 </div>
-                <div class="banner-mascots">
-                    <img src="assets/steve_mascot.png" class="banner-mini-mascot" alt="Steve Status Indicator">
-                    <img src="assets/alex_mascot.png" class="banner-mini-mascot" alt="Alex Status Indicator">
+                <div class="stat-card running">
+                    <span class="label">Active Bots</span>
+                    <span class="value" id="statActiveBots">0</span>
+                </div>
+                <div class="stat-card stopped">
+                    <span class="label">Offline Bots</span>
+                    <span class="value" id="statOfflineBots">0</span>
                 </div>
             </div>
 
+            <!-- Controls and Filters -->
             <div class="server-controls">
-                <div class="server-stats">
-                    <i class="fa-solid fa-gamepad"></i> Servers: <span id="serverCount">0/3</span>
-                </div>
                 <div class="search-box">
-                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                    <input type="text" id="serverSearch" placeholder="Search servers...">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="serverSearch" class="form-input" placeholder="Search servers by IP, port or ID...">
                 </div>
             </div>
 
-            <div class="dashboard-layout">
-                <div class="servers-section">
-                    <div class="server-list" id="serverList">
-                        <!-- Servers will be loaded here dynamically -->
-                        <div class="empty-state">
-                            <img src="assets/empty-server.png" alt="No servers" class="empty-icon">
-                            <h2>No Minecraft Servers</h2>
-                            <p>You don't have any servers yet. Click the button below to create your first server.</p>
-                            <button class="btn primary-btn" onclick="window.location.href='/create'">
-                                Create First Server
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SIDEBAR COMPANION BOT PANEL -->
-                <div class="companion-sidebar">
-                    <div class="companion-heading">
-                        <i class="fa-solid fa-shield-halved"></i> BOT COMPANIONS
-                    </div>
-                    <div class="companions-container">
-                        <div class="companion-block character-steve" onclick="triggerMascotPhrase('steve')">
-                            <div class="mascot-img-wrap">
-                                <img src="assets/steve_mascot.png" alt="Steve Mascot">
-                            </div>
-                            <div class="mascot-info">
-                                <h5>Steve <span class="badge badge-java">Java</span></h5>
-                                <p class="companion-status-line"><span class="mc-bullet">●</span> Online & Ready</p>
-                                <div class="balloon" id="steveBalloon">"Let's craft an automatic resource loop!"</div>
-                            </div>
-                        </div>
-
-                        <div class="companion-block character-alex" onclick="triggerMascotPhrase('alex')">
-                            <div class="mascot-img-wrap">
-                                <img src="assets/alex_mascot.png" alt="Alex Mascot">
-                            </div>
-                            <div class="mascot-info">
-                                <h5>Alex <span class="badge badge-bedrock">Bedrock</span></h5>
-                                <p class="companion-status-line"><span class="mc-bullet">●</span> Dynamic AFK</p>
-                                <div class="balloon" id="alexBalloon">"Watch out for Creepers when idle!"</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pro-tips-card">
-                        <div class="tip-header"><i class="fa-solid fa-star"></i> AFK PRO TIP:</div>
-                        <p id="proTipText" class="tip-body">Enable 'Auto-recurrent movement' inside config to bypass custom AFK check plugins!</p>
-                    </div>
+            <!-- Servers Grid Section -->
+            <div class="server-grid" id="serverGrid">
+                <!-- Dynamically loaded servers will appear here -->
+                <div class="empty-state">
+                    <i class="fa-solid fa-network-wired"></i>
+                    <h2>No Minecraft Servers Found</h2>
+                    <p>You haven't registered any server instances yet. Create one to launch a background companion bot.</p>
+                    <button class="btn btn-primary" onclick="window.location.href='/create'">
+                        Create Your First Server
+                    </button>
                 </div>
             </div>
 
-
-             <!-- Logs & Events panel: select a server to view its logs and recent events -->
+            <!-- Logs & Events Monospace Dual-Console -->
             <div class="logs-panel">
-                <label for="logServerSelect">Server tanlash:</label>
-                <select id="logServerSelect">
-                    <option value="">-- Server tanlang --</option>
-                </select>
-                <!-- <div class="logs-actions">
-                    <button id="downloadLogsBtn" class="btn"> <i class="fa fa-download" aria-hidden="true"></i> Download Logs</button>
-                    <button id="downloadEventsBtn" class="btn"> <i class="fa fa-download" aria-hidden="true"></i> Download Events</button>
-                </div> -->
-                <div class="console-wrapper logs-and-events">
+                <div class="logs-header">
+                    <h3><i class="fa-solid fa-square-terminal"></i> Console Output</h3>
+                    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <label for="logServerSelect" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">Active Instance:</label>
+                        <select id="logServerSelect" class="form-input" style="width: 260px; margin-bottom: 0;">
+                            <option value="">-- Select a Server --</option>
+                        </select>
+                        <button id="downloadLogsBtn" class="btn btn-ghost" disabled>
+                            <i class="fa-solid fa-download"></i> Logs
+                        </button>
+                        <button id="downloadEventsBtn" class="btn btn-ghost" disabled>
+                            <i class="fa-solid fa-download"></i> Events
+                        </button>
+                    </div>
+                </div>
+
+                <div class="console-wrapper">
                     <div class="logs-col">
-                        <h4><i class="fa fa-file-alt" aria-hidden="true"></i> Logs</h4>
-                        <pre id="serverLogs" class="server-logs">Server tanlanmadi</pre>
+                        <h4>Raw Terminal Logs</h4>
+                        <pre id="serverLogs" class="server-logs">No server selected.</pre>
                     </div>
                     <div class="events-col">
-                        <h4><i class="fa fa-exclamation-circle" aria-hidden="true"></i> Events</h4>
-                        <pre id="serverEvents" class="server-events">Server tanlanmadi.</pre>
+                        <h4>Lifecycle Events</h4>
+                        <pre id="serverEvents" class="server-events">No server selected.</pre>
                     </div>
-                </div>
-
-                <!-- Events popup (slide from right) -->
-                <div id="eventsPopup" class="events-popup hidden" aria-hidden="true" role="dialog" aria-modal="false" aria-labelledby="eventsPopupLabel" tabindex="-1" inert>
-                    <div class="events-popup-header">
-                        <span id="eventsPopupLabel">Oxirgi amalar</span>
-                        <button id="closeEventsPopup" class="btn small" aria-label="Close events panel"><i class="fa fa-times"></i></button>
-                    </div>
-                    <div id="eventsPopupList" class="events-popup-list" aria-live="polite">Ohirgi amal mavjud emas</div>
-                </div>
-                <div class="events-toggle-group">
-                    <button id="eventsPopupToggle" class="events-popup-toggle" title="Show recent events" aria-controls="eventsPopup" aria-expanded="false"><i class="fa fa-bell"></i></button>
-                    <button id="eventsPopupDisableToggle" class="events-popup-disable" title="Disable pop-up events" aria-pressed="false" aria-label="Toggle pop-up events"><i class="fa fa-bell-slash"></i></button>
                 </div>
             </div>
 
+            <!-- Slide-out Activities Drawer/Popup -->
+            <div id="eventsPopup" class="events-popup hidden" aria-hidden="true" role="dialog" aria-modal="false" aria-labelledby="eventsPopupLabel" tabindex="-1" inert>
+                <div class="events-popup-header">
+                    <span id="eventsPopupLabel">Recent Activities</span>
+                    <button id="closeEventsPopup" class="btn btn-ghost small-btn" aria-label="Close activity log"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div id="eventsPopupList" class="events-popup-list" aria-live="polite">No recent activities found</div>
+            </div>
+
+            <!-- Drawer Controls -->
+            <div class="events-toggle-group" style="position: fixed; bottom: 24px; left: 24px; display: flex; gap: 8px; z-index: 999;">
+                <button id="eventsPopupToggle" class="btn btn-primary" style="border-radius: 50%; width: 48px; height: 48px; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg);" title="Show recent activities" aria-controls="eventsPopup" aria-expanded="false">
+                    <i class="fa-solid fa-bell"></i>
+                </button>
+                <button id="eventsPopupDisableToggle" class="btn btn-ghost" style="border-radius: 50%; width: 48px; height: 48px; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg);" title="Toggle Activity Pop-ups" aria-pressed="false" aria-label="Toggle notifications">
+                    <i class="fa-solid fa-bell-slash"></i>
+                </button>
+            </div>
+
+            <!-- Global Toast Container -->
+            <div id="toastContainer"></div>
         </main>
 
         <footer class="app-footer">
-            <p>Minecraft Server Manager v1.0 &copy; 2023</p>
+            <p>MC-AFK Bot Panel &copy; 2026. Made with Vanilla Tech.</p>
         </footer>
     </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', async () => {
-        try {
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
             const token = localStorage.getItem('token') || '';
             const logoutBtn = document.getElementById('logoutBtn');
+            
+            // Authorization Routing Check
             if (logoutBtn) {
                 if (!token) {
-                    logoutBtn.innerHTML = '<i class="fa fa-right-to-bracket" aria-hidden="true"></i> Login';
-                    logoutBtn.className = 'btn login-btn';
+                    logoutBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Login';
+                    logoutBtn.className = 'btn btn-primary';
                     logoutBtn.addEventListener('click', () => {
                         window.location.href = '/auth/login.html';
                     });
@@ -166,105 +146,77 @@
                 }
             }
 
-            const serverList = document.getElementById('serverList');
-            const serverCount = document.getElementById('serverCount');
+            const serverGrid = document.getElementById('serverGrid');
             const logSelect = document.getElementById('logServerSelect');
-
+            const searchInput = document.getElementById('serverSearch');
+            
+            // Statistics counters elements
+            const statTotal = document.getElementById('statTotalServers');
+            const statActive = document.getElementById('statActiveBots');
+            const statOffline = document.getElementById('statOfflineBots');
+            
+            let allProjects = {};
             let currentServerIds = [];
+            let searchQuery = '';
 
-            // Mascot Phrases & Interactions
-            const stevePhrases = [
-                "Let's craft an automatic resource loop!",
-                "Is that a creeper behind us? Just kidding!",
-                "AFK-ing is the ultimate resource gatherer!",
-                "Water bucket MLG ready at a moment's notice!",
-                "Checking surrounding chunks... All clear!",
-                "Double-check your port forwarding, buddy!"
-            ];
+            // Handle Search Event
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    searchQuery = e.target.value.toLowerCase().trim();
+                    filterAndRenderServers();
+                });
+            }
 
-            const alexPhrases = [
-                "Watch out for Creepers when idle!",
-                "Running native Raknet-jsp connection wrappers!",
-                "I've got your back on both Bedrock and Java!",
-                "Rotating username pool to secure the slot!",
-                "Always carry a shield, you never know!",
-                "Anti-kick dynamic actions running gracefully!"
-            ];
+            function filterAndRenderServers() {
+                const cards = serverGrid.querySelectorAll('.server-card');
+                let visibleCount = 0;
 
-            const tipsList = [
-                "Connecting bots rotate usernames automatically if they get kicked to bypass limits.",
-                "Enable 'Auto-recurrent movement' inside config to bypass custom AFK check plugins!",
-                "Check server port bindings carefully when connecting Java and Bedrock proxies.",
-                "The system keeps running server tasks even when you close the dashboard tab!",
-                "The event console filters only high relevance lifecycle events for clean logs."
-            ];
+                cards.forEach(card => {
+                    const id = card.getAttribute('data-id');
+                    const server = allProjects[id];
+                    if (!server) return;
 
-            window.triggerMascotPhrase = function(character) {
-                if (character === 'steve') {
-                    const rand = stevePhrases[Math.floor(Math.random() * stevePhrases.length)];
-                    const balloon = document.getElementById('steveBalloon');
-                    if (balloon) {
-                        balloon.textContent = `"${rand}"`;
-                        balloon.classList.add('pop-animation');
-                        setTimeout(() => balloon.classList.remove('pop-animation'), 400);
+                    const matchSearch = 
+                        id.toLowerCase().includes(searchQuery) ||
+                        server.host.toLowerCase().includes(searchQuery) ||
+                        String(server.port).includes(searchQuery) ||
+                        server.version.toLowerCase().includes(searchQuery);
+
+                    if (matchSearch) {
+                        card.style.display = 'flex';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
                     }
-                } else if (character === 'alex') {
-                    const rand = alexPhrases[Math.floor(Math.random() * alexPhrases.length)];
-                    const balloon = document.getElementById('alexBalloon');
-                    if (balloon) {
-                        balloon.textContent = `"${rand}"`;
-                        balloon.classList.add('pop-animation');
-                        setTimeout(() => balloon.classList.remove('pop-animation'), 400);
+                });
+
+                // Display empty state if everything is filtered out
+                const existingEmpty = serverGrid.querySelector('.empty-state');
+                if (visibleCount === 0) {
+                    if (!existingEmpty) {
+                        const empty = document.createElement('div');
+                        empty.className = 'empty-state';
+                        empty.innerHTML = `
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <h2>No Servers Match Search</h2>
+                            <p>No results found for "${escapeHTML(searchQuery)}". Try clearing your search filter.</p>
+                        `;
+                        serverGrid.appendChild(empty);
                     }
+                } else if (existingEmpty && Object.keys(allProjects).length > 0) {
+                    existingEmpty.remove();
                 }
-            };
+            }
 
-            // Periodically rotate tips
-            setInterval(() => {
-                const tipTextEl = document.getElementById('proTipText');
-                if (tipTextEl) {
-                    const randTip = tipsList[Math.floor(Math.random() * tipsList.length)];
-                    tipTextEl.textContent = randTip;
-                }
-            }, 12000);
-
-            // Serverlar sonini yangilash
             function escapeHTML(str) {
                 return String(str).replace(/[&<>"']/g, function(m) {
                     return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"})[m];
                 });
             }
 
-            function getHeartsHTML(status) {
-                let hearts = '';
-                const activeCount = status === 'running' ? 5 : 0;
-                for (let i = 0; i < 5; i++) {
-                    if (i < activeCount) {
-                        hearts += '<i class="fa-solid fa-heart mc-heart pulse-red" style="color: #e74c3c; margin-right: 4px;"></i>';
-                    } else {
-                        hearts += '<i class="fa-regular fa-heart mc-heart-empty" style="color: #95a5a6; margin-right: 4px;"></i>';
-                    }
-                }
-                return `<div class="heart-containers" title="${status === 'running' ? 'Active AFK mode' : 'Idle mode'}">${hearts}</div>`;
-            }
-
-            function getXPBarHTML(status) {
-                const fillPercent = status === 'running' ? '100%' : '0%';
-                const levelNum = status === 'running' ? '99' : '01';
-                return `
-                    <div class="xp-bar-container">
-                        <span class="xp-level">${levelNum}</span>
-                        <div class="xp-bar-track">
-                             <div class="xp-bar-fill" style="width: ${fillPercent};"></div>
-                        </div>
-                    </div>
-                `;
-            }
-
             async function refreshServers(forceRedraw = false) {
                 try {
                     const activeToken = localStorage.getItem('token') || '';
-
                     const response = await fetch('/api/projects', {
                         headers: { 'Authorization': `Bearer ${activeToken}` }
                     });
@@ -280,95 +232,104 @@
                         return;
                     }
 
-                    const projects = data.projects;
-                    const newServerIds = Object.keys(projects).sort();
+                    allProjects = data.projects;
+                    const newServerIds = Object.keys(allProjects).sort();
 
-                    if (serverCount) {
-                        serverCount.textContent = `${newServerIds.length}/3`;
-                    }
+                    // Update stats counters
+                    let totalCount = newServerIds.length;
+                    let activeCount = 0;
+                    let stoppedCount = 0;
+                    
+                    newServerIds.forEach(id => {
+                        if (allProjects[id].status === 'running') {
+                            activeCount++;
+                        } else {
+                            stoppedCount++;
+                        }
+                    });
+
+                    if (statTotal) statTotal.textContent = totalCount;
+                    if (statActive) statActive.textContent = activeCount;
+                    if (statOffline) statOffline.textContent = stoppedCount;
 
                     // If zero servers, render empty state and clear option elements
-                    if (newServerIds.length === 0) {
+                    if (totalCount === 0) {
                         currentServerIds = [];
-                        serverList.innerHTML = `
+                        serverGrid.innerHTML = `
                             <div class="empty-state">
-                                <img src="assets/empty-server.png" alt="No servers" class="empty-icon">
-                                <h2>No Minecraft Servers</h2>
-                                <p>You don't have any servers yet. Click the button below to create your first server.</p>
-                                <button class="btn primary-btn" onclick="window.location.href='/create'">
-                                    Create First Server
+                                <i class="fa-solid fa-network-wired"></i>
+                                <h2>No Minecraft Servers Found</h2>
+                                <p>You haven't registered any server instances yet. Create one to launch a background companion bot.</p>
+                                <button class="btn btn-primary" onclick="window.location.href='/create'">
+                                    Create Your First Server
                                 </button>
                             </div>
                         `;
                         if (logSelect) {
-                            logSelect.innerHTML = '<option value="">-- Server tanlang --</option>';
+                            logSelect.innerHTML = '<option value="">-- Select a Server --</option>';
                         }
+                        updateConsoleButtons();
                         return;
                     }
 
-                    const idsChanged = JSON.stringify(currentServerIds) !== JSON.stringify(newServerIds) || serverList.querySelector('.empty-state');
+                    const idsChanged = JSON.stringify(currentServerIds) !== JSON.stringify(newServerIds) || serverGrid.querySelector('.empty-state');
 
                     if (forceRedraw || idsChanged) {
                         currentServerIds = newServerIds;
-                        serverList.innerHTML = '';
+                        serverGrid.innerHTML = '';
                         
                         let previousSelectedLogId = logSelect ? logSelect.value : '';
                         if (logSelect) {
-                            logSelect.innerHTML = '<option value="">-- Server tanlang --</option>';
+                            logSelect.innerHTML = '<option value="">-- Select a Server --</option>';
                         }
 
-                        for (const [id, server] of Object.entries(projects)) {
+                        for (const [id, server] of Object.entries(allProjects)) {
                             const statusClass = server.status === 'running' ? 'status-running' : 'status-stopped';
                             const statusText = server.status === 'running' ? 'Running' : 'Stopped';
-                            const heartsMarkup = getHeartsHTML(server.status);
-                            const xpMarkup = getXPBarHTML(server.status);
                             
                             const serverCard = document.createElement('div');
-                            serverCard.className = 'server-card';
+                            serverCard.className = 'server-card glass-card';
+                            serverCard.setAttribute('data-id', id);
                             serverCard.id = `server-${id}`;
                             serverCard.innerHTML = `
-                                <div class="server-header">
-                                    <div class="server-type-badge ${server.type}">
+                                <div class="server-card-header">
+                                    <div class="badge ${server.type === 'java' ? 'badge-java' : 'badge-bedrock'}">
                                         ${server.type === 'java' ? '<i class="fa-solid fa-mug-hot"></i> Java' : '<i class="fa-solid fa-cube"></i> Bedrock'}
                                     </div>
-                                    <div class="server-status ${statusClass}">
-                                        ${heartsMarkup}
+                                    <div class="status-indicator ${statusClass}">
+                                        <span class="status-dot"></span>
                                         <span class="status-text">${escapeHTML(statusText)}</span>
                                     </div>
                                 </div>
                                 
-                                <div class="server-details">
-                                    <div class="detail-row">
-                                        <span class="detail-label">ID:</span>
-                                        <span class="detail-value text-gold">${escapeHTML(id)}</span>
+                                <div class="server-card-body">
+                                    <div class="info-row">
+                                        <span class="info-label">ID:</span>
+                                        <span class="info-value" style="color: var(--accent-green); font-weight: bold;">${escapeHTML(id)}</span>
                                     </div>
-                                    <div class="detail-row">
-                                        <span class="detail-label">Version:</span>
-                                        <span class="detail-value">${escapeHTML(server.version)}</span>
+                                    <div class="info-row">
+                                        <span class="info-label">Version:</span>
+                                        <span class="info-value">${escapeHTML(server.version)}</span>
                                     </div>
-                                    <div class="detail-row">
-                                        <span class="detail-label">Address:</span>
-                                        <span class="detail-value address-highlight">${escapeHTML(server.host)}:${escapeHTML(server.port)}</span>
-                                    </div>
-                                    <div class="detail-row align-center">
-                                        <span class="detail-label">AFK Level:</span>
-                                        <div class="detail-value">${xpMarkup}</div>
+                                    <div class="info-row">
+                                        <span class="info-label">Address:</span>
+                                        <span class="info-value address">${escapeHTML(server.host)}:${escapeHTML(server.port)}</span>
                                     </div>
                                 </div>
                                 
-                                <div class="server-actions">
-                                    <button class="btn action-btn start-btn mc-action-start" onclick="startServer('${id}')" ${server.status === 'running' ? 'disabled' : ''}>
-                                        <i class="fa fa-play btn-icon" aria-hidden="true"></i> Start
+                                <div class="server-card-footer">
+                                    <button class="btn btn-primary start-btn" onclick="startServer('${id}')" ${server.status === 'running' ? 'disabled' : ''}>
+                                        <i class="fa-solid fa-play"></i> Start
                                     </button>
-                                    <button class="btn action-btn stop-btn mc-action-stop" onclick="stopServer('${id}')" ${server.status === 'stopped' ? 'disabled' : ''}>
-                                        <i class="fa fa-stop btn-icon" aria-hidden="true"></i> Stop
+                                    <button class="btn btn-danger stop-btn" onclick="stopServer('${id}')" ${server.status === 'stopped' ? 'disabled' : ''}>
+                                        <i class="fa-solid fa-stop"></i> Stop
                                     </button>
-                                    <button class="btn action-btn delete-btn mc-action-delete" onclick="deleteServer('${id}')">
-                                        <i class="fa fa-trash btn-icon" aria-hidden="true"></i> Delete
+                                    <button class="btn btn-ghost delete-btn" onclick="deleteServer('${id}')">
+                                        <i class="fa-solid fa-trash-can"></i>
                                     </button>
                                 </div>
                             `;
-                            serverList.appendChild(serverCard);
+                            serverGrid.appendChild(serverCard);
 
                             if (logSelect) {
                                 const opt = document.createElement('option');
@@ -381,34 +342,25 @@
                         if (logSelect && previousSelectedLogId && currentServerIds.includes(previousSelectedLogId)) {
                             logSelect.value = previousSelectedLogId;
                         }
+                        
+                        if (searchQuery) {
+                            filterAndRenderServers();
+                        }
                     } else {
-                        // IDs match exactly - surgically update status, classes and button attributes in-place to avoid layout flickeing
-                        for (const [id, server] of Object.entries(projects)) {
+                        // Surgical update to avoid layout flickering
+                        for (const [id, server] of Object.entries(allProjects)) {
                             const serverCard = document.getElementById(`server-${id}`);
                             if (serverCard) {
-                                const statusElement = serverCard.querySelector('.server-status');
+                                const statusIndicator = serverCard.querySelector('.status-indicator');
                                 const startBtn = serverCard.querySelector('.start-btn');
                                 const stopBtn = serverCard.querySelector('.stop-btn');
-                                const xlElement = serverCard.querySelector('.xp-level');
-                                const xfElement = serverCard.querySelector('.xp-bar-fill');
                                 
-                                if (statusElement) {
-                                    statusElement.classList.remove('status-running', 'status-stopped');
-                                    statusElement.classList.add(server.status === 'running' ? 'status-running' : 'status-stopped');
-                                    statusElement.innerHTML = getHeartsHTML(server.status) + `<span class="status-text">${server.status === 'running' ? 'Running' : 'Stopped'}</span>`;
+                                if (statusIndicator) {
+                                    statusIndicator.className = `status-indicator ${server.status === 'running' ? 'status-running' : 'status-stopped'}`;
+                                    statusIndicator.querySelector('.status-text').textContent = server.status === 'running' ? 'Running' : 'Stopped';
                                 }
-                                if (xlElement) {
-                                    xlElement.textContent = server.status === 'running' ? '99' : '01';
-                                }
-                                if (xfElement) {
-                                    xfElement.style.width = server.status === 'running' ? '100%' : '0%';
-                                }
-                                if (startBtn) {
-                                    startBtn.disabled = server.status === 'running';
-                                }
-                                if (stopBtn) {
-                                    stopBtn.disabled = server.status === 'stopped';
-                                }
+                                if (startBtn) startBtn.disabled = server.status === 'running';
+                                if (stopBtn) stopBtn.disabled = server.status === 'stopped';
                             }
                         }
                     }
@@ -420,582 +372,442 @@
             // Perform initial load
             await refreshServers(true);
 
-            // Establish background interval with periodic API polls to keep active statuses synchronized
+            // Periodically synchronize server statuses
             const autoRefreshInterval = setInterval(() => {
                 refreshServers(false);
             }, 3000);
 
-            // Health and admin controls (show raknet status and rebuild button for admins)
-            (async function loadHealthAndAdmin() {
-                try {
-                    const token = localStorage.getItem('token');
-                    if (!token) return; // not logged in
+            // Log & Events selection handling
+            let logPollInterval = null;
+            let eventsPollInterval = null;
+            const serverLogs = document.getElementById('serverLogs');
+            const serverEvents = document.getElementById('serverEvents');
+            const downloadBtn = document.getElementById('downloadLogsBtn');
+            const downloadEventsBtn = document.getElementById('downloadEventsBtn');
 
-                    const [healthRes, verifyRes] = await Promise.all([
-                        fetch('/api/health'),
-                        fetch('/api/auth/verify', { headers: { 'Authorization': `Bearer ${token}` } })
-                    ]);
-
-                    const health = await healthRes.json();
-                    const verify = await verifyRes.json();
-
-                    // Add health info to header
-                    const headerActions = document.querySelector('.header-actions');
-                    if (headerActions) {
-                        const statusEl = document.createElement('div');
-                        statusEl.className = 'raknet-status';
-                        statusEl.innerHTML = `<i class="fa ${health.raknet.installed ? 'fa-check-circle' : 'fa-times-circle'}" aria-hidden="true"></i> Raknet: ${health.raknet.installed ? 'OK' : 'Missing'}`;
-                        headerActions.appendChild(statusEl);
-
-                        // Admin Badge
-                        if (verify.success && verify.isAdmin) {
-                            const adminBadge = document.createElement('span');
-                            adminBadge.className = 'badge badge-admin';
-                            adminBadge.textContent = 'ADMIN MODE';
-                            adminBadge.style.cssText = 'background: #e67e22; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 10px;';
-                            headerActions.appendChild(adminBadge);
-                        }
-
-                        if (verify.success && verify.isAdmin) {
-                            const rebuildBtn = document.createElement('button');
-                            rebuildBtn.className = 'btn rebuild-btn';
-                            rebuildBtn.innerHTML = '<i class="fa fa-wrench" aria-hidden="true"></i> Rebuild raknet-native';
-                            rebuildBtn.addEventListener('click', async () => {
-                                rebuildBtn.disabled = true;
-                                const originalText = rebuildBtn.innerHTML;
-                                rebuildBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Rebuilding...';
-                                try {
-                                    const resp = await fetch('/api/admin/rebuild-raknet', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
-                                    const data = await resp.json();
-                                    if (data.success) {
-                                        alert('Rebuild finished. Check server logs and /api/health. Output:\n' + (data.stdout || data.stderr || 'No output'));
-                                    } else {
-                                        alert('Rebuild failed: ' + (data.error || (data.stderr || 'Unknown')));
-                                    }
-                                } catch (err) {
-                                    alert('Rebuild request failed: ' + err.message);
-                                } finally {
-                                    rebuildBtn.disabled = false;
-                                    rebuildBtn.innerHTML = originalText;
-                                }
-                            });
-                            headerActions.appendChild(rebuildBtn);
-
-                            // Add view logs button
-                            const viewLogsBtn = document.createElement('button');
-                            viewLogsBtn.className = 'btn logs-btn';
-                            viewLogsBtn.innerHTML = '<i class="fa fa-file-alt" aria-hidden="true"></i> View rebuild logs';
-                            viewLogsBtn.addEventListener('click', async () => {
-                                try {
-                                    const r = await fetch('/api/admin/rebuild-logs', { headers: { 'Authorization': `Bearer ${token}` } });
-                                    const j = await r.json();
-                                    if (!j.success) {
-                                        alert('No logs: ' + (j.error || 'unknown'));
-                                        return;
-                                    }
-                                    const w = window.open('', '_blank');
-                                    const txt = `Rebuild logs (latest):\nTimestamp: ${j.latest.timestamp}\nSuccess: ${j.latest.success}\n\nSTDOUT:\n${j.latest.stdout || ''}\n\nSTDERR:\n${j.latest.stderr || ''}\n\nError: ${j.latest.error || 'none'}`;
-                                    w.document.body.style.whiteSpace = 'pre-wrap';
-                                    w.document.title = 'Rebuild logs';
-                                    w.document.body.textContent = txt;
-                                } catch (err) {
-                                    alert('Failed to fetch logs: ' + err.message);
-                                }
-                            });
-                            headerActions.appendChild(viewLogsBtn);
-                        }
-                    }
-                } catch (e) {
-                    console.warn('Health/admin UI load failed:', e);
+            function clearLogPoll() {
+                if (logPollInterval) {
+                    clearInterval(logPollInterval);
+                    logPollInterval = null;
                 }
+            }
+            function clearEventsPoll() {
+                if (eventsPollInterval) {
+                    clearInterval(eventsPollInterval);
+                    eventsPollInterval = null;
+                }
+            }
+
+            function updateConsoleButtons() {
+                const id = logSelect.value;
+                if (id) {
+                    downloadBtn.removeAttribute('disabled');
+                    downloadEventsBtn.removeAttribute('disabled');
+                } else {
+                    downloadBtn.setAttribute('disabled', 'true');
+                    downloadEventsBtn.setAttribute('disabled', 'true');
+                }
+            }
+
+            async function fetchAndRenderLogs(projectId) {
+                if (!projectId) {
+                    serverLogs.textContent = 'No server selected.';
+                    return;
+                }
+
+                try {
+                    const activeToken = localStorage.getItem('token');
+                    const res = await fetch(`/api/projects/${projectId}/logs?lines=500`, { headers: { 'Authorization': `Bearer ${activeToken}` } });
+                    if (!res.ok) {
+                        const j = await res.json().catch(() => ({}));
+                        serverLogs.textContent = 'Failed to fetch logs: ' + (j.error || res.statusText);
+                        return;
+                    }
+                    const j = await res.json();
+                    const text = (j.log && j.log.trim()) ? j.log : 'No logs yet.';
+                    serverLogs.textContent = text;
+                    serverLogs.scrollTop = serverLogs.scrollHeight;
+                } catch (err) {
+                    serverLogs.textContent = 'Error fetching logs: ' + err.message;
+                }
+            }
+
+            async function fetchAndRenderEvents(projectId) {
+                if (!projectId) {
+                    if (serverEvents) serverEvents.textContent = 'No server selected.';
+                    return;
+                }
+
+                try {
+                    const activeToken = localStorage.getItem('token');
+                    const res = await fetch(`/api/projects/${projectId}/events?lines=200`, { headers: { 'Authorization': `Bearer ${activeToken}` } });
+                    if (!res.ok) {
+                        const j = await res.json().catch(() => ({}));
+                        if (serverEvents) serverEvents.textContent = 'Failed to fetch events: ' + (j.error || res.statusText);
+                        return;
+                    }
+                    const j = await res.json();
+                    const rawText = (j.events && j.events.trim()) ? j.events : '';
+
+                    // Filter only lifecycle events
+                    const lines = rawText.split(/\r?\n/).filter(Boolean);
+                    const lifecycleLines = lines.filter(line => isLifecycleEvent(line));
+
+                    // Normalize and deduplicate identical consecutive lines
+                    const normalized = lifecycleLines.map(normalizeEventLine).filter(Boolean);
+                    const deduped = normalized.filter((l, i, a) => i === 0 || l !== a[i-1]);
+                    const displayText = deduped.length ? deduped.join('\n') : 'No lifecycle events yet.';
+
+                    if (serverEvents) {
+                        serverEvents.textContent = displayText;
+                        serverEvents.scrollTop = serverEvents.scrollHeight;
+                    }
+
+                    // Display notification popup for latest lifecycle change
+                    const lastLineRaw = deduped.slice(-1)[0] || '';
+                    const plainMsg = lastLineRaw.replace(/^.*?:\s*/, '');
+                    if (plainMsg && plainMsg !== lastSeenEvent) {
+                        lastSeenEvent = plainMsg;
+                        showEventsPopup(plainMsg, { noTimestamp: true });
+                    }
+
+                } catch (err) {
+                    if (serverEvents) serverEvents.textContent = 'Error fetching events: ' + err.message;
+                }
+            }
+
+            let lastSeenEvent = '';
+            const eventsPopup = document.getElementById('eventsPopup');
+            const eventsPopupList = document.getElementById('eventsPopupList');
+            const eventsPopupToggle = document.getElementById('eventsPopupToggle');
+            const closeEventsPopup = document.getElementById('closeEventsPopup');
+            const eventsPopupDisableToggle = document.getElementById('eventsPopupDisableToggle');
+
+            let popupsEnabled = (() => {
+                const v = localStorage.getItem('popupsEnabled');
+                return v === null ? true : v !== 'false';
             })();
 
-        } catch (error) {
-            console.error('Error loading servers:', error);
-            showToast('Failed to load servers. Please try again.', 'error');
-        }
-
-        // Log & Events selection handling
-        let logPollInterval = null;
-        let eventsPollInterval = null;
-        const logSelect = document.getElementById('logServerSelect');
-        const serverLogs = document.getElementById('serverLogs');
-        const serverEvents = document.getElementById('serverEvents');
-        const downloadBtn = document.getElementById('downloadLogsBtn');
-        const downloadEventsBtn = document.getElementById('downloadEventsBtn');
-
-        function clearLogPoll() {
-            if (logPollInterval) {
-                clearInterval(logPollInterval);
-                logPollInterval = null;
-            }
-        }
-        function clearEventsPoll() {
-            if (eventsPollInterval) {
-                clearInterval(eventsPollInterval);
-                eventsPollInterval = null;
-            }
-        }
-
-        async function fetchAndRenderLogs(projectId) {
-            if (!projectId) {
-                serverLogs.textContent = 'No server selected.';
-                return;
-            }
-
-            try {
-                const token = localStorage.getItem('token');
-                const res = await fetch(`/api/projects/${projectId}/logs?lines=500`, { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!res.ok) {
-                    const j = await res.json().catch(() => ({}));
-                    serverLogs.textContent = 'Failed to fetch logs: ' + (j.error || res.statusText);
-                    return;
+            function setPopupsEnabled(enabled) {
+                popupsEnabled = !!enabled;
+                localStorage.setItem('popupsEnabled', popupsEnabled);
+                if (eventsPopupDisableToggle) {
+                    eventsPopupDisableToggle.setAttribute('aria-pressed', String(!popupsEnabled));
+                    eventsPopupDisableToggle.className = popupsEnabled ? 'btn btn-ghost' : 'btn btn-danger';
                 }
-                const j = await res.json();
-                const text = (j.log && j.log.trim()) ? j.log : 'No logs yet.';
-                serverLogs.textContent = text;
-                serverLogs.scrollTop = serverLogs.scrollHeight;
-            } catch (err) {
-                serverLogs.textContent = 'Error fetching logs: ' + err.message;
-            }
-        }
-
-        async function fetchAndRenderEvents(projectId) {
-            if (!projectId) {
-                if (serverEvents) serverEvents.textContent = 'No server selected.';
-                return;
+                if (eventsPopupToggle) {
+                    if (!popupsEnabled) eventsPopupToggle.style.opacity = '0.5'; else eventsPopupToggle.style.opacity = '1';
+                }
+                if (!popupsEnabled && eventsPopup && !eventsPopup.classList.contains('hidden')) {
+                    eventsPopup.classList.add('hidden');
+                    eventsPopup.setAttribute('aria-hidden', 'true');
+                }
+                showToast(popupsEnabled ? 'Pop-ups enabled' : 'Pop-ups disabled', popupsEnabled ? 'success' : 'error');
             }
 
-            try {
-                const token = localStorage.getItem('token');
-                const res = await fetch(`/api/projects/${projectId}/events?lines=200`, { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!res.ok) {
-                    const j = await res.json().catch(() => ({}));
-                    if (serverEvents) serverEvents.textContent = 'Failed to fetch events: ' + (j.error || res.statusText);
-                    // per user request: do NOT show error popups for non-lifecycle messages
-                    return;
-                }
-                const j = await res.json();
-                const rawText = (j.events && j.events.trim()) ? j.events : '';
-
-                // Filter to only lifecycle events for the UI
-                const lines = rawText.split(/\r?\n/).filter(Boolean);
-                const lifecycleLines = lines.filter(line => isLifecycleEvent(line));
-
-                // Normalize and dedupe consecutive identical lines to avoid repeats
-                const normalized = lifecycleLines.map(normalizeEventLine).filter(Boolean);
-                const deduped = normalized.filter((l, i, a) => i === 0 || l !== a[i-1]);
-                const displayText = deduped.length ? deduped.join('\n') : 'No lifecycle events yet.';
-
-                // Update events box (show only filtered/deduped lifecycle events)
-                if (serverEvents) {
-                    serverEvents.textContent = displayText;
-                    serverEvents.scrollTop = serverEvents.scrollHeight;
-                }
-
-                // Show popup only for the latest lifecycle event (normalized)
-                const lastLineRaw = deduped.slice(-1)[0] || '';
-                const plainMsg = lastLineRaw.replace(/^.*?:\s*/, '');
-                if (plainMsg && plainMsg !== lastSeenEvent) {
-                    lastSeenEvent = plainMsg;
-                    showEventsPopup(plainMsg, { noTimestamp: true });
-                }
-
-            } catch (err) {
-                if (serverEvents) serverEvents.textContent = 'Error fetching events: ' + err.message;
-                // Do not show error popups per user preference
-            }
-        }
-
-        // Small popup helper behavior
-        let lastSeenEvent = '';
-        const eventsPopup = document.getElementById('eventsPopup');
-        const eventsPopupList = document.getElementById('eventsPopupList');
-        const eventsPopupToggle = document.getElementById('eventsPopupToggle');
-        const closeEventsPopup = document.getElementById('closeEventsPopup');
-        const eventsPopupDisableToggle = document.getElementById('eventsPopupDisableToggle');
-
-        // persistent user preference to enable/disable popups (default: enabled)
-        let popupsEnabled = (() => {
-            const v = localStorage.getItem('popupsEnabled');
-            return v === null ? true : v !== 'false';
-        })();
-
-        function setPopupsEnabled(enabled) {
-            popupsEnabled = !!enabled;
-            localStorage.setItem('popupsEnabled', popupsEnabled);
             if (eventsPopupDisableToggle) {
-                eventsPopupDisableToggle.setAttribute('aria-pressed', String(!popupsEnabled));
-                eventsPopupDisableToggle.title = popupsEnabled ? 'Disable pop-up events' : 'Enable pop-up events';
-            }
-            if (eventsPopupToggle) {
-                if (!popupsEnabled) eventsPopupToggle.classList.add('disabled'); else eventsPopupToggle.classList.remove('disabled');
-            }
-            // if disabling, hide the popup if open
-            if (!popupsEnabled && eventsPopup && !eventsPopup.classList.contains('hidden')) {
-                if (eventsPopup.contains(document.activeElement) && eventsPopupToggle) eventsPopupToggle.focus();
-                if ('inert' in HTMLElement.prototype) eventsPopup.inert = true; else eventsPopup.setAttribute('inert','');
-                eventsPopup.classList.add('hidden');
-                eventsPopup.setAttribute('aria-hidden', 'true');
-                if (eventsPopupToggle) eventsPopupToggle.setAttribute('aria-expanded', 'false');
+                eventsPopupDisableToggle.addEventListener('click', () => {
+                    setPopupsEnabled(!popupsEnabled);
+                });
+                setPopupsEnabled(popupsEnabled);
             }
 
-            // Show a small toast to indicate the new state
-            if (popupsEnabled) {
-                showToast('Pop-ups enabled', 'success');
-            } else {
-                showToast('Pop-ups disabled', 'error');
+            function isLifecycleEvent(msg) {
+                if (!msg || typeof msg !== 'string') return false;
+                const lower = msg.toLowerCase();
+                if (/\breconnect attempt\b/i.test(lower)) return true;
+                const transientRegex = /\b(retry in|retrying in|\d+\s*second|\d+\s*sec)\b/i;
+                if (transientRegex.test(lower)) return false;
+                return /\b(created|added|started|joined|stopped|exited|restarted|restarting|restart|reconnect)\b/i.test(lower);
             }
-        }
 
-        if (eventsPopupDisableToggle) {
-            eventsPopupDisableToggle.addEventListener('click', () => {
-                setPopupsEnabled(!popupsEnabled);
-            });
-            // initialize UI state
-            setPopupsEnabled(popupsEnabled);
-        }
-
-        // Only show lifecycle events (created / added / stopped / restarted) — include reconnect attempts in UI
-        function isLifecycleEvent(msg) {
-            if (!msg || typeof msg !== 'string') return false;
-            const lower = msg.toLowerCase();
-
-            // If the line explicitly mentions "reconnect attempt" show it (user requested)
-            if (/\breconnect attempt\b/i.test(lower)) return true;
-
-            // Ignore pure transient countdown lines (e.g., "retrying in 10s")
-            const transientRegex = /\b(retry in|retrying in|\d+\s*second|\d+\s*sec|soniyadan|soniya)\b/i;
-            if (transientRegex.test(lower)) return false;
-
-            // Positive lifecycle keywords (success states and reconnect)
-            return /\b(created|added|started|joined|serverga|serverga qo|serverga ulandi|stopped|exited|restarted|restarting|restart|reconnect)\b/i.test(lower);
-        }
-
-        function getLifecycleType(msg) {
-            const lower = (msg||'').toLowerCase();
-            if (/\b(created|added)\b/.test(lower)) return 'added';
-            if (/\b(stopped|exited)\b/.test(lower)) return 'stopped';
-            if (/\b(restarted|restarting|restart)\b/.test(lower)) return 'restarted';
-            if (/\b(reconnect attempt|reconnect)\b/.test(lower)) return 'reconnect';
-            if (/\b(started|joined|serverga|serverga ulandi|serverga qo)\b/.test(lower)) return 'started';
-            return 'info';
-        }
-
-        // Normalize event lines for display and dedupe
-        function normalizeEventLine(line) {
-            if (!line) return '';
-            // remove leading timestamp and level: [ISO] [level]
-            let s = String(line).replace(/^\[.*?\]\s*\[.*?\]\s*/, '').trim();
-            // Normalize common phrases
-            s = s.replace(/Process exited with code\s+\w+/i, 'Process exited');
-            s = s.replace(/\s+\-\s+/, ' - ');
-            return s;
-        }
-
-        function showEventsPopup(msg, opts = {}) {
-            if (!eventsPopup || !eventsPopupList) return;
-            // Respect user's popup preference
-            if (!popupsEnabled) return;
-            // Only show lifecycle events in the popup per user request
-            if (!isLifecycleEvent(msg)) return;
-
-            const type = getLifecycleType(msg);
-            const item = document.createElement('div');
-            item.className = `events-popup-item event-type-${type}`;
-            item.tabIndex = -1; // make focusable programmatically
-
-            // Build a cleaner, professional inner markup
-            const iconHTML = type === 'added' ? '<i class="fa fa-plus-circle"></i>' : (type === 'stopped' ? '<i class="fa fa-stop-circle"></i>' : (type === 'restarted' ? '<i class="fa fa-redo-alt"></i>' : (type === 'reconnect' ? '<i class="fa fa-exclamation-triangle"></i>' : '<i class="fa fa-server"></i>')));
-            const shortTitle = type === 'added' ? 'Added' : (type === 'stopped' ? 'Stopped' : (type === 'restarted' ? 'Restarted' : (type === 'reconnect' ? 'Reconnect' : 'Info')));
-
-            const content = document.createElement('div');
-            content.className = 'events-popup-item-inner';
-            content.innerHTML = `
-                <div class="event-icon">${iconHTML}</div>
-                <div class="event-body">
-                    <div class="event-title">${shortTitle}</div>
-                    <div class="event-text">${opts.noTimestamp ? escapeHTML(msg) : escapeHTML(new Date().toLocaleTimeString() + ' — ' + msg)}</div>
-                </div>
-            `;
-
-            item.appendChild(content);
-            eventsPopupList.insertBefore(item, eventsPopupList.firstChild);
-
-            // Show popup and adjust accessibility attributes
-            if ('inert' in HTMLElement.prototype) eventsPopup.inert = false; else eventsPopup.removeAttribute('inert');
-            eventsPopup.classList.remove('hidden');
-            eventsPopup.setAttribute('aria-hidden', 'false');
-            if (eventsPopupToggle) eventsPopupToggle.setAttribute('aria-expanded', 'true');
-
-            // focus the newly added item for screen readers/users
-            try { item.focus(); } catch (e) {}
-
-            // briefly flash the toggle button
-            if (eventsPopupToggle) {
-                eventsPopupToggle.classList.add('new-event');
-                setTimeout(() => eventsPopupToggle.classList.remove('new-event'), 3000);
+            function getLifecycleType(msg) {
+                const lower = (msg||'').toLowerCase();
+                if (/\b(created|added)\b/.test(lower)) return 'added';
+                if (/\b(stopped|exited)\b/.test(lower)) return 'stopped';
+                if (/\b(restarted|restarting|restart)\b/.test(lower)) return 'restarted';
+                if (/\b(reconnect attempt|reconnect)\b/.test(lower)) return 'reconnect';
+                if (/\b(started|joined)\b/.test(lower)) return 'started';
+                return 'info';
             }
-        }
 
-        // Replace old behavior: we only show lifecycle events and do not show other errors in popup
+            function normalizeEventLine(line) {
+                if (!line) return '';
+                let s = String(line).replace(/^\[.*?\]\s*\[.*?\]\s*/, '').trim();
+                s = s.replace(/Process exited with code\s+\w+/i, 'Process exited');
+                return s;
+            }
 
-        if (eventsPopupToggle) eventsPopupToggle.addEventListener('click', () => {
-            if (!eventsPopup) return;
-            const willHide = !eventsPopup.classList.contains('hidden');
-            if (willHide) {
-                // if focus is inside popup, move it to toggle before hiding
-                if (eventsPopup.contains(document.activeElement) && eventsPopupToggle) eventsPopupToggle.focus();
-                // set inert and hide
-                if ('inert' in HTMLElement.prototype) eventsPopup.inert = true; else eventsPopup.setAttribute('inert','');
-                eventsPopup.classList.add('hidden');
-                eventsPopup.setAttribute('aria-hidden', 'true');
-                if (eventsPopupToggle) eventsPopupToggle.setAttribute('aria-expanded', 'false');
-            } else {
-                // show
-                if ('inert' in HTMLElement.prototype) eventsPopup.inert = false; else eventsPopup.removeAttribute('inert');
+            function showEventsPopup(msg, opts = {}) {
+                if (!eventsPopup || !eventsPopupList || !popupsEnabled || !isLifecycleEvent(msg)) return;
+
+                const type = getLifecycleType(msg);
+                const item = document.createElement('div');
+                item.className = `events-popup-item event-type-${type}`;
+                item.style.padding = '8px 12px';
+                item.style.borderBottom = '1px solid var(--border-color)';
+                item.style.fontSize = '0.85rem';
+                
+                const formattedTime = new Date().toLocaleTimeString();
+                item.innerHTML = `<strong style="color: var(--accent-green);">[${formattedTime}]</strong> ${escapeHTML(msg)}`;
+
+                if (eventsPopupList.innerHTML === 'No recent activities found') {
+                    eventsPopupList.innerHTML = '';
+                }
+                eventsPopupList.insertBefore(item, eventsPopupList.firstChild);
+
                 eventsPopup.classList.remove('hidden');
                 eventsPopup.setAttribute('aria-hidden', 'false');
-                if (eventsPopupToggle) eventsPopupToggle.setAttribute('aria-expanded', 'true');
-                // focus the first item or close button
-                const first = eventsPopup.querySelector('.events-popup-item');
-                if (first) try { first.focus(); } catch (e) {} else if (closeEventsPopup) closeEventsPopup.focus();
+
+                setTimeout(() => {
+                    eventsPopup.classList.add('hidden');
+                    eventsPopup.setAttribute('aria-hidden', 'true');
+                }, 5000);
             }
-        });
-        if (closeEventsPopup) closeEventsPopup.addEventListener('click', () => {
-            if (!eventsPopup) return;
-            // if closing while inner element is focused, move focus to toggle
-            if (eventsPopup.contains(document.activeElement) && eventsPopupToggle) eventsPopupToggle.focus();
-            if ('inert' in HTMLElement.prototype) eventsPopup.inert = true; else eventsPopup.setAttribute('inert','');
-            eventsPopup.classList.add('hidden');
-            eventsPopup.setAttribute('aria-hidden', 'true');
-            if (eventsPopupToggle) eventsPopupToggle.setAttribute('aria-expanded', 'false');
-        });
 
-        // Global events polling (simple popup even when no server is selected)
-        async function fetchAndRenderGlobalEvents() {
-            try {
-                const token = localStorage.getItem('token');
-                const res = await fetch(`/api/events?lines=20`, { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!res.ok) return;
-                const j = await res.json();
-                const text = (j.events && j.events.trim()) ? j.events : '';
-                const lines = text.split(/\r?\n/).filter(Boolean);
-                // find last lifecycle event line across global events and normalize/dedupe
-                let lastLifecycle = '';
-                for (let i = lines.length - 1; i >= 0; i--) {
-                    if (isLifecycleEvent(lines[i])) { lastLifecycle = normalizeEventLine(lines[i].replace(/^.*?:\s*/, '')); break; }
-                }
-                if (lastLifecycle && lastLifecycle !== lastSeenEvent) {
-                    lastSeenEvent = lastLifecycle;
-                    showEventsPopup(lastLifecycle, { noTimestamp: true });
-                }
-            } catch (e) {
-                // ignore fetch errors silently per user preference
+            if (eventsPopupToggle) {
+                eventsPopupToggle.addEventListener('click', () => {
+                    if (!eventsPopup) return;
+                    const isHidden = eventsPopup.classList.contains('hidden');
+                    if (isHidden) {
+                        eventsPopup.classList.remove('hidden');
+                        eventsPopup.setAttribute('aria-hidden', 'false');
+                    } else {
+                        eventsPopup.classList.add('hidden');
+                        eventsPopup.setAttribute('aria-hidden', 'true');
+                    }
+                });
             }
-        }
 
-        // Start global polling every 3s
-        setInterval(fetchAndRenderGlobalEvents, 3000);
-        // Run once immediately
-        fetchAndRenderGlobalEvents();
+            if (closeEventsPopup) {
+                closeEventsPopup.addEventListener('click', () => {
+                    eventsPopup.classList.add('hidden');
+                    eventsPopup.setAttribute('aria-hidden', 'true');
+                });
+            }
 
-        if (logSelect) {
-            logSelect.addEventListener('change', (e) => {
-                const id = e.target.value;
-                clearLogPoll();
-                clearEventsPoll();
-                fetchAndRenderLogs(id);
-                fetchAndRenderEvents(id);
-                if (id) {
-                    logPollInterval = setInterval(() => fetchAndRenderLogs(id), 2000);
-                    eventsPollInterval = setInterval(() => fetchAndRenderEvents(id), 2000);
-                }
-            });
-        }
-
-        if (downloadBtn) {
-            downloadBtn.addEventListener('click', async () => {
-                const id = logSelect.value;
-                if (!id) return alert('Select a server first');
-                const token = localStorage.getItem('token');
+            async function fetchAndRenderGlobalEvents() {
                 try {
-                    const res = await fetch(`/api/projects/${id}/logs?lines=10000`, { headers: { 'Authorization': `Bearer ${token}` } });
-                    if (!res.ok) return alert('Failed to download logs');
+                    const activeToken = localStorage.getItem('token');
+                    const res = await fetch(`/api/events?lines=20`, { headers: { 'Authorization': `Bearer ${activeToken}` } });
+                    if (!res.ok) return;
                     const j = await res.json();
-                    const blob = new Blob([j.log || ''], { type: 'text/plain' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `${id}-logs.txt`;
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                    URL.revokeObjectURL(url);
-                } catch (err) {
-                    alert('Download failed: ' + err.message);
+                    const text = (j.events && j.events.trim()) ? j.events : '';
+                    const lines = text.split(/\r?\n/).filter(Boolean);
+                    
+                    let lastLifecycle = '';
+                    for (let i = lines.length - 1; i >= 0; i--) {
+                        if (isLifecycleEvent(lines[i])) { 
+                            lastLifecycle = normalizeEventLine(lines[i]); 
+                            break; 
+                        }
+                    }
+                    if (lastLifecycle && lastLifecycle !== lastSeenEvent) {
+                        lastSeenEvent = lastLifecycle;
+                        showEventsPopup(lastLifecycle, { noTimestamp: true });
+                    }
+                } catch (e) {
+                    // Fail silently for background poll
                 }
-            });
-        }
+            }
 
-        if (downloadEventsBtn) {
-            downloadEventsBtn.addEventListener('click', async () => {
-                const id = logSelect.value;
-                if (!id) return alert('Select a server first');
-                const token = localStorage.getItem('token');
+            setInterval(fetchAndRenderGlobalEvents, 3000);
+            fetchAndRenderGlobalEvents();
+
+            if (logSelect) {
+                logSelect.addEventListener('change', (e) => {
+                    const id = e.target.value;
+                    clearLogPoll();
+                    clearEventsPoll();
+                    updateConsoleButtons();
+                    fetchAndRenderLogs(id);
+                    fetchAndRenderEvents(id);
+                    if (id) {
+                        logPollInterval = setInterval(() => fetchAndRenderLogs(id), 2000);
+                        eventsPollInterval = setInterval(() => fetchAndRenderEvents(id), 2000);
+                    }
+                });
+            }
+
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', async () => {
+                    const id = logSelect.value;
+                    if (!id) return;
+                    const activeToken = localStorage.getItem('token');
+                    try {
+                        const res = await fetch(`/api/projects/${id}/logs?lines=10000`, { headers: { 'Authorization': `Bearer ${activeToken}` } });
+                        if (!res.ok) return showToast('Failed to download logs', 'error');
+                        const j = await res.json();
+                        const blob = new Blob([j.log || ''], { type: 'text/plain' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${id}-logs.txt`;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        URL.revokeObjectURL(url);
+                    } catch (err) {
+                        showToast('Download failed: ' + err.message, 'error');
+                    }
+                });
+            }
+
+            if (downloadEventsBtn) {
+                downloadEventsBtn.addEventListener('click', async () => {
+                    const id = logSelect.value;
+                    if (!id) return;
+                    const activeToken = localStorage.getItem('token');
+                    try {
+                        const res = await fetch(`/api/projects/${id}/events?lines=10000`, { headers: { 'Authorization': `Bearer ${activeToken}` } });
+                        if (!res.ok) return showToast('Failed to download events', 'error');
+                        const j = await res.json();
+                        const blob = new Blob([j.events || ''], { type: 'text/plain' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${id}-events.txt`;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        URL.revokeObjectURL(url);
+                    } catch (err) {
+                        showToast('Download failed: ' + err.message, 'error');
+                    }
+                });
+            }
+
+            async function startServer(serverId) {
                 try {
-                    const res = await fetch(`/api/projects/${id}/events?lines=10000`, { headers: { 'Authorization': `Bearer ${token}` } });
-                    if (!res.ok) return alert('Failed to download events');
-                    const j = await res.json();
-                    const blob = new Blob([j.events || ''], { type: 'text/plain' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `${id}-events.txt`;
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                    URL.revokeObjectURL(url);
-                } catch (err) {
-                    alert('Download failed: ' + err.message);
+                    const activeToken = localStorage.getItem('token');
+                    const response = await fetch(`/api/projects/${serverId}/start`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${activeToken}`
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        showToast('Companion bot started successfully!', 'success');
+                        updateServerStatus(serverId, 'running');
+                    } else {
+                        showToast(data.error || 'Failed to start bot', 'error');
+                    }
+                } catch (error) {
+                    showToast('Failed to start bot. Connection error.', 'error');
                 }
-            });
-        }
-
-    async function startServer(serverId) {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`/api/projects/${serverId}/start`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                showToast('Server started successfully!', 'success');
-                updateServerStatus(serverId, 'running');
-            } else {
-                showToast(data.error || 'Failed to start server', 'error');
             }
-        } catch (error) {
-            console.error('Error starting server:', error);
-            showToast('Failed to start server. Please try again.', 'error');
-        }
-    }
 
-    async function stopServer(serverId) {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`/api/projects/${serverId}/stop`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
+            async function stopServer(serverId) {
+                try {
+                    const activeToken = localStorage.getItem('token');
+                    const response = await fetch(`/api/projects/${serverId}/stop`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${activeToken}`
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        showToast('Companion bot stopped successfully.', 'success');
+                        updateServerStatus(serverId, 'stopped');
+                    } else {
+                        showToast(data.error || 'Failed to stop bot', 'error');
+                    }
+                } catch (error) {
+                    showToast('Failed to stop bot. Connection error.', 'error');
                 }
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                showToast('Server stopped successfully!', 'success');
-                updateServerStatus(serverId, 'stopped');
-            } else {
-                showToast(data.error || 'Failed to stop server', 'error');
             }
-        } catch (error) {
-            console.error('Error stopping server:', error);
-            showToast('Failed to stop server. Please try again.', 'error');
-        }
-    }
 
-    async function deleteServer(serverId) {
-        if (!confirm('Are you sure you want to delete this server?')) return;
-        
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`/api/projects/${serverId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                showToast('Server deleted successfully!', 'success');
-                document.getElementById(`server-${serverId}`).remove();
+            async function deleteServer(serverId) {
+                if (!confirm('Are you sure you want to delete this server instance?')) return;
                 
-                // Agar serverlar qolmagan bo'lsa, empty state ko'rsatish
-                if (document.querySelectorAll('.server-card').length === 0) {
-                    document.getElementById('serverList').innerHTML = `
-                        <div class="empty-state">
-                            <img src="assets/empty-server.png" alt="No servers" class="empty-icon">
-                            <h2>No Minecraft Servers</h2>
-                            <p>You don't have any servers yet. Click the button below to create your first server.</p>
-                            <button class="btn primary-btn" onclick="window.location.href='/create'">
-                                Create First Server
-                            </button>
-                        </div>
-                    `;
+                try {
+                    const activeToken = localStorage.getItem('token');
+                    const response = await fetch(`/api/projects/${serverId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${activeToken}`
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        showToast('Server instance deleted.', 'success');
+                        const card = document.getElementById(`server-${serverId}`);
+                        if (card) card.remove();
+                        
+                        // Check if no servers are left
+                        if (serverGrid.querySelectorAll('.server-card').length === 0) {
+                            serverGrid.innerHTML = `
+                                <div class="empty-state">
+                                    <i class="fa-solid fa-network-wired"></i>
+                                    <h2>No Minecraft Servers Found</h2>
+                                    <p>You haven't registered any server instances yet. Create one to launch a background companion bot.</p>
+                                    <button class="btn btn-primary" onclick="window.location.href='/create'">
+                                        Create Your First Server
+                                    </button>
+                                </div>
+                            `;
+                        }
+                        
+                        // Force refresh stats & options
+                        refreshServers(true);
+                    } else {
+                        showToast(data.error || 'Failed to delete server', 'error');
+                    }
+                } catch (error) {
+                    showToast('Failed to delete server. Connection error.', 'error');
                 }
-            } else {
-                showToast(data.error || 'Failed to delete server', 'error');
             }
-        } catch (error) {
-            console.error('Error deleting server:', error);
-            showToast('Failed to delete server. Please try again.', 'error');
-        }
-    }
 
-    function updateServerStatus(serverId, status) {
-        const serverCard = document.getElementById(`server-${serverId}`);
-        if (!serverCard) return;
-        
-        const statusElement = serverCard.querySelector('.server-status');
-        const startBtn = serverCard.querySelector('.start-btn');
-        const stopBtn = serverCard.querySelector('.stop-btn');
-        const xlElement = serverCard.querySelector('.xp-level');
-        const xfElement = serverCard.querySelector('.xp-bar-fill');
-        
-        if (statusElement) {
-            statusElement.className = `server-status status-${status}`;
-            statusElement.innerHTML = getHeartsHTML(status) + `<span class="status-text">${status === 'running' ? 'Running' : 'Stopped'}</span>`;
-        }
-        if (xlElement) {
-            xlElement.textContent = status === 'running' ? '99' : '01';
-        }
-        if (xfElement) {
-            xfElement.style.width = status === 'running' ? '100%' : '0%';
-        }
-        
-        if (startBtn) startBtn.disabled = status === 'running';
-        if (stopBtn) stopBtn.disabled = status === 'stopped';
-    }
+            function updateServerStatus(serverId, status) {
+                const serverCard = document.getElementById(`server-${serverId}`);
+                if (!serverCard) return;
+                
+                const statusIndicator = serverCard.querySelector('.status-indicator');
+                const startBtn = serverCard.querySelector('.start-btn');
+                const stopBtn = serverCard.querySelector('.stop-btn');
+                
+                if (statusIndicator) {
+                    statusIndicator.className = `status-indicator status-${status}`;
+                    statusIndicator.querySelector('.status-text').textContent = status === 'running' ? 'Running' : 'Stopped';
+                }
+                
+                if (startBtn) startBtn.disabled = status === 'running';
+                if (stopBtn) stopBtn.disabled = status === 'stopped';
 
-    function showToast(message, type) {
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        toast.textContent = message;
-        document.body.appendChild(toast);
-        
-        setTimeout(() => {
-            toast.classList.add('fade-out');
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
-    }
+                // Recalculate stats counters
+                refreshServers(false);
+            }
 
-    // Expose control functions to global scope for inline onclick handlers
-    window.startServer = startServer;
-    window.stopServer = stopServer;
-    window.deleteServer = deleteServer;
+            function showToast(message, type) {
+                const container = document.getElementById('toastContainer');
+                if (!container) return;
 
-    // Wire up the logout button was moved to the DOMContentLoaded handler to support dynamic Login / Logout behaviors dynamically
+                const toast = document.createElement('div');
+                toast.className = `toast toast-${type}`;
+                
+                const icon = type === 'success' 
+                    ? '<i class="fa-solid fa-circle-check" style="color: var(--accent-green);"></i>' 
+                    : '<i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-red);"></i>';
 
-    // Close DOMContentLoaded listener
-    });
-</script>
+                toast.innerHTML = `${icon} <span>${message}</span>`;
+                container.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.classList.add('fade-out');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3500);
+            }
+
+            // Expose globally for inline onclick handlers
+            window.startServer = startServer;
+            window.stopServer = stopServer;
+            window.deleteServer = deleteServer;
+        });
+    </script>
 </body>
 </html>

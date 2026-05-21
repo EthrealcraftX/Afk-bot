@@ -3,159 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - MC-AFK Controller Panel</title>
-    <!-- Favicon: single correct path -->
+    <title>Sign Up — MC-AFK Bot Panel</title>
+    <meta name="description" content="Create your MC-AFK Bot Panel account to start managing Minecraft AFK bot sessions.">
     <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
-    <!-- FontAwesome & Custom styling -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="auth.css">
 </head>
 <body>
-    <div class="auth-split-wrapper" id="authBox">
-        
-        <!-- Left Showcase Side -->
-        <div class="auth-branding-panel">
-            <div class="branding-header">
-                <div class="branding-logo">
-                    <img src="../assets/minecraft-icon.png" alt="Minecraft Logo">
-                    <span>MC-AFK Panel</span>
-                </div>
-                <div class="branding-promo-text">
-                    <h2>Host automated AFK bot companions in real-time</h2>
-                    <p>Unlock custom parameters to keep inventories syncing, experience running, and anti-afk rotations executing flawlessly.</p>
-                </div>
+    <div class="app-container">
+
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <i class="fa-solid fa-terminal"></i>
+                    <span>MC-AFK Bot Panel</span>
+                </a>
             </div>
+        </header>
 
-            <!-- Features Showcase -->
-            <div class="branding-features">
-                <div class="feature-item">
-                    <div class="feature-icon-wrapper">
-                        <i class="fa-solid fa-star"></i>
-                    </div>
-                    <div class="feature-info">
-                        <h4>Create Custom Admin Accounts</h4>
-                        <p>Fully secure your server list access with personalized password credentials.</p>
-                    </div>
+        <!-- Main centered auth area -->
+        <main class="auth-main">
+            <div class="auth-container glass-card" id="authBox">
+
+                <!-- Brand Logo -->
+                <a href="/" class="auth-logo">
+                    <i class="fa-solid fa-terminal"></i>
+                    <span>MC-AFK Bot Panel</span>
+                </a>
+
+                <!-- Heading -->
+                <div class="auth-heading">
+                    <h1>Create Account</h1>
+                    <p>Set up your credentials to manage bot sessions</p>
                 </div>
 
-                <div class="feature-item">
-                    <div class="feature-icon-wrapper">
-                        <i class="fa-solid fa-shield-halved"></i>
-                    </div>
-                    <div class="feature-info">
-                        <h4>Multi-Host Protection</h4>
-                        <p>Run separate background tasks safely with completely isolated worker structures.</p>
-                    </div>
+                <!-- Error alert -->
+                <div class="auth-error" id="errorMessage">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span id="errorText"></span>
                 </div>
 
-                <div class="feature-item">
-                    <div class="feature-icon-wrapper">
-                        <i class="fa-solid fa-bolt"></i>
+                <!-- Signup Form -->
+                <form id="signupForm" autocomplete="on">
+
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <div class="input-icon-wrap">
+                            <i class="fa-solid fa-user input-icon"></i>
+                            <input
+                                type="text"
+                                id="username"
+                                class="form-input"
+                                placeholder="Min. 4 characters"
+                                required
+                                minlength="4"
+                                autocomplete="username"
+                            >
+                        </div>
                     </div>
-                    <div class="feature-info">
-                        <h4>Ultra-Fast Response Proxies</h4>
-                        <p>Keep connection loops live even during low physical bandwidth cycles.</p>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-icon-wrap">
+                            <i class="fa-solid fa-lock input-icon"></i>
+                            <input
+                                type="password"
+                                id="password"
+                                class="form-input"
+                                placeholder="Min. 6 characters"
+                                required
+                                minlength="6"
+                                autocomplete="new-password"
+                            >
+                            <button type="button" class="pw-toggle" id="pwToggle1" aria-label="Toggle password visibility">
+                                <i class="fa-solid fa-eye" id="pwEyeIcon1"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Status Indicator Stack -->
-            <div class="branding-mascots-preview">
-                <div class="mini-avatar-stack">
-                    <img src="../assets/steve_mascot.png" alt="Steve Companion">
-                    <img src="../assets/alex_mascot.png" alt="Alex Companion">
-                </div>
-                <div>
-                    <p><span class="pulse-bullet"></span> Join active administrators managing worker loops</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Sign Up Form Side -->
-        <div class="auth-form-panel">
-            <div class="auth-form-header">
-                <div class="auth-form-title">Akount yaratish</div>
-                <div class="auth-form-subtitle">Create your control panel credentials to sync companion proxies</div>
-            </div>
-
-            <!-- Dynamic Error Message Alert (matches login.html) -->
-            <div id="errorMessage">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                <span id="errorText"></span>
-            </div>
-
-            <!-- Main Auth Form -->
-            <form class="auth-form" id="signupForm">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <div class="input-container">
-                        <i class="fa-solid fa-user input-icon"></i>
-                        <input type="text" id="username" placeholder="Minecraft Admin" required minlength="4" autocomplete="username">
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <div class="input-icon-wrap">
+                            <i class="fa-solid fa-lock input-icon"></i>
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                class="form-input"
+                                placeholder="Repeat your password"
+                                required
+                                minlength="6"
+                                autocomplete="new-password"
+                            >
+                            <button type="button" class="pw-toggle" id="pwToggle2" aria-label="Toggle confirm password visibility">
+                                <i class="fa-solid fa-eye" id="pwEyeIcon2"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="input-container">
-                        <i class="fa-solid fa-lock input-icon"></i>
-                        <input type="password" id="password" placeholder="Min. 6 characters" required minlength="6" autocomplete="new-password">
-                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password', 'passwordEyeIcon')" aria-label="Toggle password visibility">
-                            <i class="fa-solid fa-eye" id="passwordEyeIcon"></i>
+                    <div class="form-group" style="margin-top: 8px;">
+                        <button type="submit" class="btn btn-primary" id="submitBtn" style="width: 100%; padding: 12px; font-size: 0.95rem;">
+                            <span id="btnLabel">Create Account</span>
+                            <i class="fa-solid fa-user-plus" id="btnIcon"></i>
                         </button>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label for="confirmPassword">Confirm Password</label>
-                    <div class="input-container">
-                        <i class="fa-solid fa-lock input-icon"></i>
-                        <input type="password" id="confirmPassword" placeholder="Repeat password" required minlength="6" autocomplete="new-password">
-                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('confirmPassword', 'confirmEyeIcon')" aria-label="Toggle password visibility">
-                            <i class="fa-solid fa-eye" id="confirmEyeIcon"></i>
-                        </button>
+                    <div class="auth-link-row">
+                        Already have an account? <a href="login.html">Sign In</a>
                     </div>
-                </div>
 
-                <button type="submit" class="auth-submit-btn" id="submitBtn">
-                    <span>Sign Up</span>
-                    <i class="fa-solid fa-user-plus"></i>
-                </button>
+                </form>
+            </div>
+        </main>
 
-                <div class="auth-link-container">
-                    Already have an account? 
-                    <a href="login.html" class="auth-link">Akount bormi? Login</a>
-                </div>
-            </form>
-        </div>
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>MC-AFK Bot Panel &copy; 2026. Made with Vanilla Tech.</p>
+        </footer>
+
     </div>
 
-    <!-- Password toggle helper -->
     <script>
-        function togglePasswordVisibility(inputId, iconId) {
-            const passwordInput = document.getElementById(inputId);
-            const eyeIcon = document.getElementById(iconId);
-            if (passwordInput && eyeIcon) {
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    eyeIcon.className = 'fa-solid fa-eye-slash';
+        // Toggle password visibility helpers
+        function setupToggle(toggleId, inputId, iconId) {
+            document.getElementById(toggleId).addEventListener('click', () => {
+                const input = document.getElementById(inputId);
+                const icon  = document.getElementById(iconId);
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.className = 'fa-solid fa-eye-slash';
                 } else {
-                    passwordInput.type = 'password';
-                    eyeIcon.className = 'fa-solid fa-eye';
+                    input.type = 'password';
+                    icon.className = 'fa-solid fa-eye';
                 }
+            });
+        }
+
+        setupToggle('pwToggle1', 'password', 'pwEyeIcon1');
+        setupToggle('pwToggle2', 'confirmPassword', 'pwEyeIcon2');
+
+        // Form submission
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username        = document.getElementById('username').value.trim();
+            const password        = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const submitBtn       = document.getElementById('submitBtn');
+            const btnLabel        = document.getElementById('btnLabel');
+            const btnIcon         = document.getElementById('btnIcon');
+
+            // Client-side validation
+            if (username.length < 4) {
+                showError('Username must be at least 4 characters.');
+                return;
             }
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters.');
+                return;
+            }
+            if (password !== confirmPassword) {
+                showError('Passwords do not match.');
+                return;
+            }
+
+            // Loading state
+            submitBtn.disabled  = true;
+            btnLabel.textContent = 'Creating account…';
+            btnIcon.className   = 'fa-solid fa-spinner fa-spin';
+
+            try {
+                const res  = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    window.location.href = 'login.html?signupSuccess=true';
+                } else {
+                    showError(data.error || 'Signup failed. Please try again.');
+                }
+            } catch (err) {
+                showError('Network error. Please try again.');
+            } finally {
+                submitBtn.disabled   = false;
+                btnLabel.textContent = 'Create Account';
+                btnIcon.className    = 'fa-solid fa-user-plus';
+            }
+        });
+
+        function showError(msg) {
+            const errorMsg  = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            errorText.textContent  = msg;
+            errorMsg.style.display = 'flex';
+
+            const authBox = document.getElementById('authBox');
+            if (authBox) {
+                authBox.style.animation = 'none';
+                authBox.offsetHeight; // force reflow
+                authBox.style.animation = 'authShake 0.4s ease';
+            }
+
+            setTimeout(() => {
+                errorMsg.style.display = 'none';
+            }, 6000);
         }
     </script>
-
-    <!-- Wire up the elegant form logic and signup handler -->
-    <script src="signup.js"></script>
-
-    <!-- Shake error helper -->
-    <style>
-        @keyframes authShake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-6px); }
-            40%, 80% { transform: translateX(6px); }
-        }
-    </style>
 </body>
 </html>
