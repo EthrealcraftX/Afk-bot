@@ -23,10 +23,17 @@ if (!SECRET_KEY) {
 const MAX_PROJECTS_PER_USER = parseInt(process.env.MAX_PROJECTS_PER_USER) || 3;
 
 // User Management functions
-async function createUser(username, password) {
+async function createUser(username, password, allowOverwrite = false) {
   try {
     const existingUser = await User.findOne({ username });
     if (existingUser) {
+      if (allowOverwrite) {
+        // Trusted bot request: reset password for existing tg_ user
+        console.log(`[API] Overwriting password for existing user '${username}' (authorized bot request).`);
+        const passwordHash = bcrypt.hashSync(password, 10);
+        await User.updateOne({ username }, { $set: { passwordHash } });
+        return { success: true, message: 'User password updated successfully' };
+      }
       return { success: false, error: 'Username already exists' };
     }
 
@@ -423,8 +430,16 @@ async function getServerStatus(projectId, username) {
       return { success: false, error: 'Permission denied' };
     }
 
+    // db.processes is the real-time source of truth.
+    // If the process is not tracked (e.g. after a server restart),
+    // the bot is definitively stopped, even if MongoDB says 'running'.
     const isRunning = !!db.processes[projectId];
     const status = isRunning ? 'running' : 'stopped';
+
+    // Sync MongoDB if it's out of date
+    if (!isRunning && project.status === 'running') {
+      await Project.updateOne({ projectId }, { $set: { status: 'stopped', stoppedAt: new Date() } });
+    }
 
     return {
       success: true,
@@ -437,6 +452,7 @@ async function getServerStatus(projectId, username) {
         type: project.type,
         status: status,
         startedAt: project.startedAt,
+        stoppedAt: project.stoppedAt,
         uptime: isRunning ? Date.now() - new Date(project.startedAt).getTime() : null
       }
     };
@@ -554,13 +570,25 @@ async function listServers(username) {
     }
 
     const allProjects = {};
+    const staleRunning = [];
+
     for (const project of projectsList) {
+      // db.processes is the authoritative real-time source.
+      // If a process isn't tracked here, the bot is stopped regardless of DB value.
+      const isRunning = !!db.processes[project.projectId];
+      const status = isRunning ? 'running' : 'stopped';
+
+      // Collect stale records to fix in DB
+      if (!isRunning && project.status === 'running') {
+        staleRunning.push(project.projectId);
+      }
+
       allProjects[project.projectId] = {
         host: project.host,
         port: project.port,
         version: project.version,
         type: project.type,
-        status: db.processes[project.projectId] ? 'running' : 'stopped',
+        status,
         id: project.projectId,
         owner: project.owner,
         movementInterval: project.movementInterval,
@@ -571,6 +599,15 @@ async function listServers(username) {
         startedAt: project.startedAt,
         stoppedAt: project.stoppedAt
       };
+    }
+
+    // Fix any stale 'running' statuses in MongoDB (happens after server restart)
+    if (staleRunning.length > 0) {
+      console.log(`[listServers] Fixing stale 'running' status for: ${staleRunning.join(', ')}`);
+      await Project.updateMany(
+        { projectId: { $in: staleRunning } },
+        { $set: { status: 'stopped', stoppedAt: new Date() } }
+      );
     }
 
     return {
@@ -588,9 +625,30 @@ async function listServers(username) {
   }
 }
 
+// On startup: reset any projects that are marked 'running' in DB but have no live process.
+// This handles the case where the server was restarted while bots were running.
+async function syncStatusOnBoot() {
+  try {
+    const staleProjects = await Project.find({ status: 'running' });
+    if (staleProjects.length > 0) {
+      const ids = staleProjects.map(p => p.projectId);
+      console.log(`[boot] Resetting stale 'running' status for ${ids.length} project(s): ${ids.join(', ')}`);
+      await Project.updateMany(
+        { projectId: { $in: ids } },
+        { $set: { status: 'stopped', stoppedAt: new Date() } }
+      );
+    }
+  } catch (err) {
+    console.error('[boot] Failed to sync statuses:', err);
+  }
+}
+
 // Initialization of templates & default users
 async function initialize() {
   try {
+    // Reset stale running statuses from previous session
+    await syncStatusOnBoot();
+
     // Ensure default "guest" user exists
     const guestUser = await User.findOne({ username: 'guest' });
     if (!guestUser) {

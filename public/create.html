@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="create.css">
     <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Telegram Mini App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
     <div class="app-container">
@@ -19,7 +21,7 @@
                     <span>MC-AFK Bot Panel</span>
                 </a>
                 <button class="btn btn-ghost" onclick="window.location.href='/'">
-                    <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+                    <i class="fa-solid fa-arrow-left"></i> Dashboar qaytish
                 </button>
             </div>
         </header>
@@ -27,7 +29,7 @@
         <main class="app-main">
             <div class="create-container">
                 <h1>Register Server</h1>
-                <p class="create-subtitle">Define server connection parameters to spin up a new companion background task.</p>
+                <p class="create-subtitle">Server qoshish uchun info kerak bo‘ladi misol: IP, port, va boshqa parametrlar</p>
                 
                 <form id="serverForm">
                     <!-- Form notifications will be injected here -->
@@ -35,7 +37,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="ip">Server IP Address</label>
-                            <input type="text" id="ip" class="form-input" placeholder="e.g. play.hypixel.net" required autocomplete="off">
+                            <input type="text" id="ip" class="form-input" placeholder="e.g. servernoomi.aternos.me" required autocomplete="off">
                         </div>
                         
                         <div class="form-group">
@@ -65,55 +67,55 @@
                     <div class="form-group version-selector active" id="javaVersions">
                         <label for="javaVersion">Java Edition Version</label>
                         <select id="javaVersion" class="form-input" required>
-                            <option value="">-- Choose Java Version --</option>
+                            <option value="">-- Java Version tanlang --</option>
                             <option value="1.8">1.8</option>
-                            <option value="1.8.1">1.8.1</option>
-                            <option value="1.8.2">1.8.2</option>
-                            <option value="1.8.3">1.8.3</option>
-                            <option value="1.8.4">1.8.4</option>
-                            <option value="1.8.5">1.8.5</option>
-                            <option value="1.8.6">1.8.6</option>
-                            <option value="1.8.7">1.8.7</option>
-                            <option value="1.8.8">1.8.8</option>
-                            <option value="1.8.9">1.8.9</option>
+                            <option value="1.8">1.8.1</option>
+                            <option value="1.8">1.8.2</option>
+                            <option value="1.8">1.8.3</option>
+                            <option value="1.8">1.8.4</option>
+                            <option value="1.8">1.8.5</option>
+                            <option value="1.8">1.8.6</option>
+                            <option value="1.8">1.8.7</option>
+                            <option value="1.8">1.8.8</option>
+                            <option value="1.8">1.8.9</option>
                             <option value="1.9">1.9</option>
-                            <option value="1.9.1">1.9.1</option>
-                            <option value="1.9.2">1.9.2</option>
-                            <option value="1.9.3">1.9.3</option>
-                            <option value="1.9.4">1.9.4</option>
+                            <option value="1.9">1.9.1</option>
+                            <option value="1.9">1.9.2</option>
+                            <option value="1.9">1.9.3</option>
+                            <option value="1.9">1.9.4</option>
                             <option value="1.10">1.10</option>
-                            <option value="1.10.1">1.10.1</option>
-                            <option value="1.10.2">1.10.2</option>
+                            <option value="1.10">1.10.1</option>
+                            <option value="1.10">1.10.2</option>
                             <option value="1.11">1.11</option>
-                            <option value="1.11.1">1.11.1</option>
-                            <option value="1.11.2">1.11.2</option>
+                            <option value="1.11">1.11.1</option>
+                            <option value="1.11">1.11.2</option>
                             <option value="1.12">1.12</option>
-                            <option value="1.12.1">1.12.1</option>
-                            <option value="1.12.2">1.12.2</option>
+                            <option value="1.12">1.12.1</option>
+                            <option value="1.12">1.12.2</option>
                             <option value="1.13">1.13</option>
-                            <option value="1.13.1">1.13.1</option>
-                            <option value="1.13.2">1.13.2</option>
+                            <option value="1.13">1.13.1</option>
+                            <option value="1.13">1.13.2</option>
                             <option value="1.14">1.14</option>
-                            <option value="1.14.1">1.14.1</option>
-                            <option value="1.14.2">1.14.2</option>
-                            <option value="1.14.3">1.14.3</option>
-                            <option value="1.14.4">1.14.4</option>
+                            <option value="1.14">1.14.1</option>
+                            <option value="1.14">1.14.2</option>
+                            <option value="1.14">1.14.3</option>
+                            <option value="1.14">1.14.4</option>
                             <option value="1.15">1.15</option>
-                            <option value="1.15.1">1.15.1</option>
-                            <option value="1.15.2">1.15.2</option>
+                            <option value="1.15">1.15.1</option>
+                            <option value="1.15">1.15.2</option>
                             <option value="1.16">1.16</option>
-                            <option value="1.16.1">1.16.1</option>
-                            <option value="1.16.2">1.16.2</option>
-                            <option value="1.16.3">1.16.3</option>
-                            <option value="1.16.4">1.16.4</option>
-                            <option value="1.16.5">1.16.5</option>
+                            <option value="1.16">1.16.1</option>
+                            <option value="1.16">1.16.2</option>
+                            <option value="1.16">1.16.3</option>
+                            <option value="1.16">1.16.4</option>
+                            <option value="1.16">1.16.5</option>
                             <option value="1.17">1.17</option>
-                            <option value="1.17.1">1.17.1</option>
+                            <option value="1.17">1.17.1</option>
                             <option value="1.18">1.18</option>
-                            <option value="1.18.1">1.18.1</option>
-                            <option value="1.18.2">1.18.2</option>
-                            <option value="1.19" selected>1.19</option>
-                            <option value="1.19.1">1.19.1</option>
+                            <option value="1.18">1.18.1</option>
+                            <option value="1.18">1.18.2</option>
+                            <option value="1.19">1.19</option>
+                            <option value="1.19">1.19.1</option>
                             <option value="1.19.2">1.19.2</option>
                             <option value="1.19.3">1.19.3</option>
                             <option value="1.19.4">1.19.4</option>
@@ -143,181 +145,178 @@
                     <div class="form-group version-selector" id="bedrockVersions">
                         <label for="bedrockVersion">Bedrock Edition Version</label>
                         <select id="bedrockVersion" class="form-input" disabled>
-                            <option value="">-- Choose Bedrock Version --</option>
-                            <option value="0.14">0.14</option>
-                            <option value="0.15">0.15</option>
-                            <option value="1.0">1.0</option>
-                            <option value="1.8.1">1.8.1</option>
-                            <option value="1.9.0">1.9.0</option>
-                            <option value="1.10.0">1.10.0</option>
-                            <option value="1.11.0">1.11.0</option>
-                            <option value="1.11.1">1.11.1</option>
-                            <option value="1.11.2">1.11.2</option>
-                            <option value="1.11.4">1.11.4</option>
-                            <option value="1.12.0">1.12.0</option>
-                            <option value="1.12.1">1.12.1</option>
-                            <option value="1.13.0">1.13.0</option>
-                            <option value="1.13.1">1.13.1</option>
-                            <option value="1.13.2">1.13.2</option>
-                            <option value="1.13.3">1.13.3</option>
-                            <option value="1.14.0">1.14.0</option>
-                            <option value="1.14.1">1.14.1</option>
-                            <option value="1.14.20">1.14.20</option>
-                            <option value="1.14.21">1.14.21</option>
-                            <option value="1.14.30">1.14.30</option>
-                            <option value="1.14.32">1.14.32</option>
-                            <option value="1.14.60">1.14.60</option>
-                            <option value="1.16.0">1.16.0</option>
-                            <option value="1.16.1">1.16.1</option>
-                            <option value="1.16.10">1.16.10</option>
-                            <option value="1.16.20">1.16.20</option>
-                            <option value="1.16.40">1.16.40</option>
-                            <option value="1.16.100">1.16.100</option>
-                            <option value="1.16.101">1.16.101</option>
-                            <option value="1.16.200">1.16.200</option>
-                            <option value="1.16.201" selected>1.16.201</option>
+                            <option value="">-- Bedrock Version tanlang --</option>
+                            <option value="1.16.201">1.8.1</option>
+                            <option value="1.16.201">1.9.0</option>
+                            <option value="1.16.201">1.10.0</option>
+                            <option value="1.16.201">1.11.0</option>
+                            <option value="1.16.201">1.11.1</option>
+                            <option value="1.16.201">1.11.2</option>
+                            <option value="1.16.201">1.11.4</option>
+                            <option value="1.16.201">1.12.0</option>
+                            <option value="1.16.201">1.12.1</option>
+                            <option value="1.16.201">1.13.0</option>
+                            <option value="1.16.201">1.13.1</option>
+                            <option value="1.16.201">1.13.2</option>
+                            <option value="1.16.201">1.13.3</option>
+                            <option value="1.16.201">1.14.0</option>
+                            <option value="1.16.201">1.14.1</option>
+                            <option value="1.16.201">1.14.20</option>
+                            <option value="1.16.201">1.14.21</option>
+                            <option value="1.16.201">1.14.30</option>
+                            <option value="1.16.201">1.14.32</option>
+                            <option value="1.16.201">1.14.60</option>
+                            <option value="1.16.201">1.16.0</option>
+                            <option value="1.16.201">1.16.1</option>
+                            <option value="1.16.201">1.16.10</option>
+                            <option value="1.16.201">1.16.20</option>
+                            <option value="1.16.201">1.16.40</option>
+                            <option value="1.16.201">1.16.100</option>
+                            <option value="1.16.201">1.16.101</option>
+                            <option value="1.16.201">1.16.200</option>
+                            <option value="1.16.201">1.16.201</option>
                             <option value="1.16.210">1.16.210</option>
                             <option value="1.16.220">1.16.220</option>
-                            <option value="1.16.221">1.16.221</option>
+                            <option value="1.16.220">1.16.221</option>
                             <option value="1.17.0">1.17.0</option>
-                            <option value="1.17.1">1.17.1</option>
-                            <option value="1.17.2">1.17.2</option>
+                            <option value="1.17.0">1.17.1</option>
+                            <option value="1.17.0">1.17.2</option>
                             <option value="1.17.10">1.17.10</option>
-                            <option value="1.17.11">1.17.11</option>
+                            <option value="1.17.10">1.17.11</option>
                             <option value="1.17.30">1.17.30</option>
-                            <option value="1.17.31">1.17.31</option>
-                            <option value="1.17.32">1.17.32</option>
-                            <option value="1.17.33">1.17.33</option>
-                            <option value="1.17.34">1.17.34</option>
+                            <option value="1.17.30">1.17.31</option>
+                            <option value="1.17.30">1.17.32</option>
+                            <option value="1.17.30">1.17.33</option>
+                            <option value="1.17.40">1.17.34</option>
                             <option value="1.17.40">1.17.40</option>
-                            <option value="1.17.41">1.17.41</option>
+                            <option value="1.17.40">1.17.41</option>
                             <option value="1.18.0">1.18.0</option>
-                            <option value="1.18.1">1.18.1</option>
-                            <option value="1.18.2">1.18.2</option>
-                            <option value="1.18.10">1.18.10</option>
+                            <option value="1.18.0">1.18.1</option>
+                            <option value="1.18.0">1.18.2</option>
+                            <option value="1.18.11">1.18.10</option>
                             <option value="1.18.11">1.18.11</option>
-                            <option value="1.18.12">1.18.12</option>
+                            <option value="1.18.11">1.18.12</option>
                             <option value="1.18.30">1.18.30</option>
-                            <option value="1.18.31">1.18.31</option>
-                            <option value="1.18.32">1.18.32</option>
-                            <option value="1.18.33">1.18.33</option>
-                            <option value="1.19.0">1.19.0</option>
+                            <option value="1.18.30">1.18.31</option>
+                            <option value="1.18.30">1.18.32</option>
+                            <option value="1.18.30">1.18.33</option>
+                            <option value="1.19.1">1.19.0</option>
                             <option value="1.19.1">1.19.1</option>
-                            <option value="1.19.2">1.19.2</option>
+                            <option value="1.19.1">1.19.2</option>
                             <option value="1.19.10">1.19.10</option>
-                            <option value="1.19.11">1.19.11</option>
+                            <option value="1.19.10">1.19.11</option>
                             <option value="1.19.20">1.19.20</option>
                             <option value="1.19.21">1.19.21</option>
-                            <option value="1.19.22">1.19.22</option>
+                            <option value="1.19.21">1.19.22</option>
                             <option value="1.19.30">1.19.30</option>
-                            <option value="1.19.31">1.19.31</option>
+                            <option value="1.19.30">1.19.31</option>
                             <option value="1.19.40">1.19.40</option>
                             <option value="1.19.41">1.19.41</option>
                             <option value="1.19.50">1.19.50</option>
-                            <option value="1.19.51">1.19.51</option>
-                            <option value="1.19.52">1.19.52</option>
+                            <option value="1.19.50">1.19.51</option>
+                            <option value="1.19.50">1.19.52</option>
                             <option value="1.19.60">1.19.60</option>
-                            <option value="1.19.61">1.19.61</option>
+                            <option value="1.19.60">1.19.61</option>
                             <option value="1.19.62">1.19.62</option>
                             <option value="1.19.63">1.19.63</option>
                             <option value="1.19.70">1.19.70</option>
-                            <option value="1.19.71">1.19.71</option>
-                            <option value="1.19.72">1.19.72</option>
-                            <option value="1.19.73">1.19.73</option>
+                            <option value="1.19.70">1.19.71</option>
+                            <option value="1.19.70">1.19.72</option>
+                            <option value="1.19.70">1.19.73</option>
                             <option value="1.19.80">1.19.80</option>
-                            <option value="1.19.81">1.19.81</option>
-                            <option value="1.19.83">1.19.83</option>
+                            <option value="1.19.80">1.19.81</option>
+                            <option value="1.19.80">1.19.83</option>
                             <option value="1.20.0">1.20.0</option>
-                            <option value="1.20.1">1.20.1</option>
+                            <option value="1.20.0">1.20.1</option>
                             <option value="1.20.10">1.20.10</option>
-                            <option value="1.20.11">1.20.11</option>
-                            <option value="1.20.12">1.20.12</option>
-                            <option value="1.20.13">1.20.13</option>
-                            <option value="1.20.14">1.20.14</option>
-                            <option value="1.20.15">1.20.15</option>
+                            <option value="1.20.10">1.20.11</option>
+                            <option value="1.20.10">1.20.12</option>
+                            <option value="1.20.10">1.20.13</option>
+                            <option value="1.20.10">1.20.14</option>
+                            <option value="1.20.10">1.20.15</option>
                             <option value="1.20.30">1.20.30</option>
-                            <option value="1.20.31">1.20.31</option>
-                            <option value="1.20.32">1.20.32</option>
+                            <option value="1.20.30">1.20.31</option>
+                            <option value="1.20.30">1.20.32</option>
                             <option value="1.20.40">1.20.40</option>
-                            <option value="1.20.41">1.20.41</option>
+                            <option value="1.20.40">1.20.41</option>
                             <option value="1.20.50">1.20.50</option>
-                            <option value="1.20.51">1.20.51</option>
-                            <option value="1.20.60">1.20.60</option>
+                            <option value="1.20.50">1.20.51</option>
+                            <option value="1.20.61">1.20.60</option>
                             <option value="1.20.61">1.20.61</option>
-                            <option value="1.20.62">1.20.62</option>
-                            <option value="1.20.70">1.20.70</option>
+                            <option value="1.20.61">1.20.62</option>
+                            <option value="1.20.71">1.20.70</option>
                             <option value="1.20.71">1.20.71</option>
-                            <option value="1.20.72">1.20.72</option>
-                            <option value="1.20.73">1.20.73</option>
+                            <option value="1.20.71">1.20.72</option>
+                            <option value="1.20.71">1.20.73</option>
                             <option value="1.20.80">1.20.80</option>
-                            <option value="1.20.81">1.20.81</option>
+                            <option value="1.20.80">1.20.81</option>
                             <option value="1.21.0">1.21.0</option>
-                            <option value="1.21.1">1.21.1</option>
+                            <option value="1.21.0">1.21.1</option>
                             <option value="1.21.2">1.21.2</option>
-                            <option value="1.21.3">1.21.3</option>
-                            <option value="1.21.20">1.21.20</option>
+                            <option value="1.21.2">1.21.3</option>
+                            <option value="1.21.21">1.21.20</option>
                             <option value="1.21.21">1.21.21</option>
-                            <option value="1.21.22">1.21.22</option>
-                            <option value="1.21.23">1.21.23</option>
+                            <option value="1.21.21">1.21.22</option>
+                            <option value="1.21.21">1.21.23</option>
                             <option value="1.21.30">1.21.30</option>
-                            <option value="1.21.31">1.21.31</option>
-                            <option value="1.21.40">1.21.40</option>
-                            <option value="1.21.41">1.21.41</option>
+                            <option value="1.21.30">1.21.31</option>
+                            <option value="1.21.42">1.21.40</option>
+                            <option value="1.21.42">1.21.41</option>
                             <option value="1.21.42">1.21.42</option>
-                            <option value="1.21.43">1.21.43</option>
-                            <option value="1.21.44">1.21.44</option>
+                            <option value="1.21.42">1.21.43</option>
+                            <option value="1.21.42">1.21.44</option>
                             <option value="1.21.50">1.21.50</option>
-                            <option value="1.21.51">1.21.51</option>
+                            <option value="1.21.50">1.21.51</option>
                             <option value="1.21.60">1.21.60</option>
-                            <option value="1.21.61">1.21.61</option>
-                            <option value="1.21.62">1.21.62</option>
+                            <option value="1.21.60">1.21.61</option>
+                            <option value="1.21.60">1.21.62</option>
                             <option value="1.21.70">1.21.70</option>
-                            <option value="1.21.71">1.21.71</option>
-                            <option value="1.21.72">1.21.72</option>
-                            <option value="1.21.73">1.21.73</option>
+                            <option value="1.21.70">1.21.71</option>
+                            <option value="1.21.70">1.21.72</option>
+                            <option value="1.21.70">1.21.73</option>
                             <option value="1.21.80">1.21.80</option>
-                            <option value="1.21.81">1.21.81</option>
-                            <option value="1.21.82">1.21.82</option>
-                            <option value="1.21.83">1.21.83</option>
-                            <option value="1.21.84">1.21.84</option>
+                            <option value="1.21.80">1.21.81</option>
+                            <option value="1.21.80">1.21.82</option>
+                            <option value="1.21.80">1.21.83</option>
+                            <option value="1.21.80">1.21.84</option>
                             <option value="1.21.90">1.21.90</option>
-                            <option value="1.21.91">1.21.91</option>
-                            <option value="1.21.92">1.21.92</option>
+                            <option value="1.21.90">1.21.91</option>
+                            <option value="1.21.90">1.21.92</option>
                             <option value="1.21.93">1.21.93</option>
-                            <option value="1.21.94">1.21.94</option>
-                            <option value="1.21.95">1.21.95</option>
+                            <option value="1.21.93">1.21.94</option>
+                            <option value="1.21.93">1.21.95</option>
                             <option value="1.21.100">1.21.100</option>
-                            <option value="1.21.101">1.21.101</option>
-                            <option value="1.21.102">1.21.102</option>
+                            <option value="1.21.100">1.21.101</option>
+                            <option value="1.21.100">1.21.102</option>
                             <option value="1.21.111">1.21.111</option>
-                            <option value="1.21.112">1.21.112</option>
-                            <option value="1.21.113">1.21.113</option>
-                            <option value="1.21.114">1.21.114</option>
+                            <option value="1.21.111">1.21.112</option>
+                            <option value="1.21.111">1.21.113</option>
+                            <option value="1.21.111">1.21.114</option>
                             <option value="1.21.120">1.21.120</option>
-                            <option value="1.21.121">1.21.121</option>
-                            <option value="1.21.122">1.21.122</option>
-                            <option value="1.21.123">1.21.123</option>
+                            <option value="1.21.120">1.21.121</option>
+                            <option value="1.21.120">1.21.122</option>
+                            <option value="1.21.120">1.21.123</option>
                             <option value="1.21.124">1.21.124</option>
                             <option value="1.21.130">1.21.130</option>
-                            <option value="1.21.131">1.21.131</option>
-                            <option value="1.21.132">1.21.132</option>
-                            <option value="26.0">26.0</option>
-                            <option value="26.1">26.1</option>
-                            <option value="26.2">26.2</option>
-                            <option value="26.3">26.3</option>
-                            <option value="26.10">26.10</option>
-                            <option value="26.11">26.11</option>
-                            <option value="26.12">26.12</option>
-                            <option value="26.13">26.13</option>
-                            <option value="26.14">26.14</option>
-                            <option value="26.20">26.20</option>
-                            <option value="26.21">26.21</option>
+                            <option value="1.21.130">1.21.131</option>
+                            <option value="1.21.130">1.21.132</option>
+                            <option value="1.26.0">26.0</option>
+                            <option value="1.26.0">26.1</option>
+                            <option value="1.26.0">26.2</option>
+                            <option value="1.26.0">26.3</option>
+                            <option value="1.26.10">26.10</option>
+                            <option value="1.26.10">26.11</option>
+                            <option value="1.26.10">26.12</option>
+                            <option value="1.26.10">26.13</option>
+                            <option value="1.26.10">26.14</option>
+                            <option value="1.26.20">26.20</option>
+                            <option value="1.26.20">26.21</option>
                         </select>
                     </div>
                     
                     <div class="submit-btn-wrapper">
                         <button type="submit" class="btn btn-primary" id="submitBtn">
-                            Create Server
+                            Server yaratish
                         </button>
                     </div>
                 </form>
@@ -330,8 +329,18 @@
     </div>
 
     <script>
-        // Redirect to login if user is not authenticated
+        // Redirect to login if user is not authenticated, support TG Mini App auto-login
         document.addEventListener('DOMContentLoaded', async () => {
+            // Check if token is passed in the URL (Telegram Mini App auto-login)
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlToken = urlParams.get('token');
+            if (urlToken) {
+                localStorage.setItem('token', urlToken);
+                // Clean up the URL to hide the token from browser history
+                const cleanUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, cleanUrl);
+            }
+
             const token = localStorage.getItem('token');
             if (!token) {
                 console.log('No token found, redirecting to login');
@@ -345,10 +354,12 @@
                 if (!verify.ok) {
                     localStorage.removeItem('token');
                     window.location.href = '/auth/login.html';
+                    return;
                 }
             } catch (e) {
                 localStorage.removeItem('token');
                 window.location.href = '/auth/login.html';
+                return;
             }
         });
 
@@ -395,18 +406,13 @@
             }
         };
 
-        // Enforce Port Bound restrictions
-        portInput.addEventListener('input', (e) => {
-            let value = parseInt(e.target.value) || 0;
-            if (value < 1) value = 1;
-            if (value > 65535) value = 65535;
-            e.target.value = value;
-        });
+        // Port range is enforced by min="1" max="65535" attributes and submit-time validation.
+        // (Live clamping on 'input' breaks copy-paste by rewriting the field mid-entry.)
 
         // Submit form creation request
         serverForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner"></span> Creating Instance...';
 
@@ -415,8 +421,8 @@
             const formData = {
                 ip: document.getElementById('ip').value.trim(),
                 port: parseInt(portInput.value),
-                version: serverType === 'java' 
-                    ? javaVersionSelect.value 
+                version: serverType === 'java'
+                    ? javaVersionSelect.value
                     : bedrockVersionSelect.value,
                 type: serverType
             };
@@ -445,7 +451,14 @@
 
                 if (result.success) {
                     showSuccessMessage('Server instance successfully registered!');
-                    setTimeout(() => window.location.href = '/', 1500);
+                    // If opened inside Telegram Mini App — close it
+                    const tg = window.Telegram?.WebApp;
+                    if (tg && tg.initData) {
+                        tg.ready();
+                        setTimeout(() => tg.close(), 1200);
+                    } else {
+                        setTimeout(() => window.location.href = '/', 1500);
+                    }
                 } else {
                     throw new Error(result.error || "Unknown response received from router");
                 }

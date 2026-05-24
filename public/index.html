@@ -20,10 +20,10 @@
                 </a>
                 <div class="header-nav">
                     <button class="btn btn-primary" onclick="window.location.href='/create'">
-                        <i class="fa-solid fa-plus"></i> New Server
+                        <i class="fa-solid fa-plus"></i> Yangi Server
                     </button>
                     <button class="btn btn-ghost" id="logoutBtn">
-                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                        <i class="fa-solid fa-right-from-bracket"></i> Chiqish
                     </button>
                 </div>
             </div>
@@ -33,11 +33,11 @@
             <!-- Modern Real-Time Stats Bar -->
             <div class="stats-bar">
                 <div class="stat-card">
-                    <span class="label">Total Servers</span>
+                    <span class="label">Umumiy Serverlar</span>
                     <span class="value" id="statTotalServers">0</span>
                 </div>
                 <div class="stat-card running">
-                    <span class="label">Active Bots</span>
+                    <span class="label">Faol Bots</span>
                     <span class="value" id="statActiveBots">0</span>
                 </div>
                 <div class="stat-card stopped">
@@ -59,10 +59,10 @@
                 <!-- Dynamically loaded servers will appear here -->
                 <div class="empty-state">
                     <i class="fa-solid fa-network-wired"></i>
-                    <h2>No Minecraft Servers Found</h2>
-                    <p>You haven't registered any server instances yet. Create one to launch a background companion bot.</p>
+                    <h2>Minecraft Server Topilmadi</h2>
+                    <p>Hali hech qanday server qo‘shmagansiz. Serverda ishlaydigan yordamchi botni ishga tushirish uchun bittasini yarating.</p>
                     <button class="btn btn-primary" onclick="window.location.href='/create'">
-                        Create Your First Server
+                        Birinchi Serveringizni Qoshing
                     </button>
                 </div>
             </div>
@@ -74,10 +74,10 @@
                     <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
                         <label for="logServerSelect" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">Active Instance:</label>
                         <select id="logServerSelect" class="form-input" style="width: 260px; margin-bottom: 0;">
-                            <option value="">-- Select a Server --</option>
+                            <option value="">-- Server tanlang --</option>
                         </select>
                         <button id="downloadLogsBtn" class="btn btn-ghost" disabled>
-                            <i class="fa-solid fa-download"></i> Logs
+                            <i class="fa-solid fa-download"></i> Loglar
                         </button>
                         <button id="downloadEventsBtn" class="btn btn-ghost" disabled>
                             <i class="fa-solid fa-download"></i> Events
@@ -87,12 +87,12 @@
 
                 <div class="console-wrapper">
                     <div class="logs-col">
-                        <h4>Raw Terminal Logs</h4>
-                        <pre id="serverLogs" class="server-logs">No server selected.</pre>
+                        <h4>Terminal Logs</h4>
+                        <pre id="serverLogs" class="server-logs">server tanlangani yoq.</pre>
                     </div>
                     <div class="events-col">
-                        <h4>Lifecycle Events</h4>
-                        <pre id="serverEvents" class="server-events">No server selected.</pre>
+                        <h4>Life cycle Events</h4>
+                        <pre id="serverEvents" class="server-events">server tanlangani yoq.</pre>
                     </div>
                 </div>
             </div>
@@ -100,14 +100,14 @@
             <!-- Slide-out Activities Drawer/Popup -->
             <div id="eventsPopup" class="events-popup hidden" aria-hidden="true" role="dialog" aria-modal="false" aria-labelledby="eventsPopupLabel" tabindex="-1" inert>
                 <div class="events-popup-header">
-                    <span id="eventsPopupLabel">Recent Activities</span>
+                    <span id="eventsPopupLabel">Oxirgi faolliklar</span>
                     <button id="closeEventsPopup" class="btn btn-ghost small-btn" aria-label="Close activity log"><i class="fa-solid fa-xmark"></i></button>
                 </div>
-                <div id="eventsPopupList" class="events-popup-list" aria-live="polite">No recent activities found</div>
+                <div id="eventsPopupList" class="events-popup-list" aria-live="polite">Oxirgi faolliklar topilmadi.</div>
             </div>
 
             <!-- Drawer Controls -->
-            <div class="events-toggle-group" style="position: fixed; bottom: 24px; left: 24px; display: flex; gap: 8px; z-index: 999;">
+            <div class="events-toggle-group" style="position: fixed; bottom: 24px; right: 24px; display: flex; gap: 8px; z-index: 999;">
                 <button id="eventsPopupToggle" class="btn btn-primary" style="border-radius: 50%; width: 48px; height: 48px; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg);" title="Show recent activities" aria-controls="eventsPopup" aria-expanded="false">
                     <i class="fa-solid fa-bell"></i>
                 </button>
@@ -434,7 +434,7 @@
 
             async function fetchAndRenderEvents(projectId) {
                 if (!projectId) {
-                    if (serverEvents) serverEvents.textContent = 'No server selected.';
+                    if (serverEvents) serverEvents.innerHTML = '<div class="no-events-placeholder">No server selected.</div>';
                     return;
                 }
 
@@ -443,7 +443,7 @@
                     const res = await fetch(`/api/projects/${projectId}/events?lines=200`, { headers: { 'Authorization': `Bearer ${activeToken}` } });
                     if (!res.ok) {
                         const j = await res.json().catch(() => ({}));
-                        if (serverEvents) serverEvents.textContent = 'Failed to fetch events: ' + (j.error || res.statusText);
+                        if (serverEvents) serverEvents.innerHTML = `<div class="console-event-row event-error"><i class="fa-solid fa-triangle-exclamation"></i> <span>Failed to fetch events: ${escapeHTML(j.error || res.statusText)}</span></div>`;
                         return;
                     }
                     const j = await res.json();
@@ -456,23 +456,53 @@
                     // Normalize and deduplicate identical consecutive lines
                     const normalized = lifecycleLines.map(normalizeEventLine).filter(Boolean);
                     const deduped = normalized.filter((l, i, a) => i === 0 || l !== a[i-1]);
-                    const displayText = deduped.length ? deduped.join('\n') : 'No lifecycle events yet.';
 
                     if (serverEvents) {
-                        serverEvents.textContent = displayText;
+                        if (deduped.length === 0) {
+                            serverEvents.innerHTML = '<div class="no-events-placeholder">No lifecycle events yet.</div>';
+                        } else {
+                            serverEvents.innerHTML = deduped.map(line => {
+                                const type = getLifecycleType(line);
+                                let icon = '<i class="fa-solid fa-circle-info"></i>';
+                                let badgeClass = 'event-info';
+                                
+                                if (type === 'started') {
+                                    icon = '<i class="fa-solid fa-circle-check" style="color: var(--accent-green);"></i>';
+                                    badgeClass = 'event-success';
+                                } else if (type === 'stopped') {
+                                    icon = '<i class="fa-solid fa-circle-stop" style="color: var(--accent-red);"></i>';
+                                    badgeClass = 'event-danger';
+                                } else if (type === 'restarted') {
+                                    icon = '<i class="fa-solid fa-rotate" style="color: var(--accent-amber);"></i>';
+                                    badgeClass = 'event-warning';
+                                } else if (type === 'reconnect') {
+                                    icon = '<i class="fa-solid fa-arrow-rotate-right" style="color: var(--accent-purple);"></i>';
+                                    badgeClass = 'event-purple';
+                                } else if (type === 'added') {
+                                    icon = '<i class="fa-solid fa-plus-circle" style="color: #3b82f6;"></i>';
+                                    badgeClass = 'event-blue';
+                                } else if (type === 'error') {
+                                    icon = '<i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-red);"></i>';
+                                    badgeClass = 'event-error';
+                                }
+                                
+                                return `<div class="console-event-row ${badgeClass}">${icon} <span>${escapeHTML(line)}</span></div>`;
+                            }).join('');
+                        }
                         serverEvents.scrollTop = serverEvents.scrollHeight;
                     }
 
                     // Display notification popup for latest lifecycle change
                     const lastLineRaw = deduped.slice(-1)[0] || '';
-                    const plainMsg = lastLineRaw.replace(/^.*?:\s*/, '');
+                    // Only strip project ID prefix if it exists, to preserve error prefixes
+                    const plainMsg = lastLineRaw.replace(/^project_\w+:\s*/, '');
                     if (plainMsg && plainMsg !== lastSeenEvent) {
                         lastSeenEvent = plainMsg;
                         showEventsPopup(plainMsg, { noTimestamp: true });
                     }
 
                 } catch (err) {
-                    if (serverEvents) serverEvents.textContent = 'Error fetching events: ' + err.message;
+                    if (serverEvents) serverEvents.innerHTML = `<div class="console-event-row event-error"><i class="fa-solid fa-triangle-exclamation"></i> <span>Error fetching events: ${escapeHTML(err.message)}</span></div>`;
                 }
             }
 
@@ -515,24 +545,56 @@
             function isLifecycleEvent(msg) {
                 if (!msg || typeof msg !== 'string') return false;
                 const lower = msg.toLowerCase();
-                if (/\breconnect attempt\b/i.test(lower)) return true;
-                const transientRegex = /\b(retry in|retrying in|\d+\s*second|\d+\s*sec)\b/i;
-                if (transientRegex.test(lower)) return false;
-                return /\b(created|added|started|joined|stopped|exited|restarted|restarting|restart|reconnect)\b/i.test(lower);
+
+                // Exclude repetitive ticks (movement, look, combat, wait timers)
+                if (lower.includes('afk harakat') || 
+                    lower.includes('yurish harakati') || 
+                    lower.includes('hujum qilindi') || 
+                    lower.includes('kutish vaqti') ||
+                    lower.includes('wait') ||
+                    lower.includes('retry in') ||
+                    lower.includes('retrying in') ||
+                    /^\d+\s*(second|sec|soniya)/i.test(lower)) {
+                    return false;
+                }
+
+                // English lifecycle keywords
+                const englishMatch = /\b(created|added|started|joined|stopped|exited|restarted|restarting|restart|reconnect|kicked|error|timeout|timed out)\b/i.test(lower);
+                if (englishMatch) return true;
+
+                // Uzbek lifecycle keywords
+                const uzbekKeywords = [
+                    'yaratilmoqda',
+                    'yaratildi',
+                    'ulandi',
+                    'qo\'shildi',
+                    'spawn',
+                    'chiqarib yuborildi',
+                    'xatolik',
+                    'xatolikka',
+                    'xato',
+                    'uzildi',
+                    'yopildi',
+                    'qayta ulanish',
+                    'reconnect'
+                ];
+                return uzbekKeywords.some(keyword => lower.includes(keyword));
             }
 
             function getLifecycleType(msg) {
                 const lower = (msg||'').toLowerCase();
-                if (/\b(created|added)\b/.test(lower)) return 'added';
-                if (/\b(stopped|exited)\b/.test(lower)) return 'stopped';
+                if (/\b(created|added)\b/.test(lower) || lower.includes('yaratildi')) return 'added';
+                if (/\b(stopped|exited)\b/.test(lower) || lower.includes('yopildi') || lower.includes('uzildi') || lower.includes('chiqarib yuborildi')) return 'stopped';
                 if (/\b(restarted|restarting|restart)\b/.test(lower)) return 'restarted';
-                if (/\b(reconnect attempt|reconnect)\b/.test(lower)) return 'reconnect';
-                if (/\b(started|joined)\b/.test(lower)) return 'started';
+                if (/\b(reconnect attempt|reconnect)\b/.test(lower) || lower.includes('qayta ulanish') || lower.includes('reconnect rejalashtirildi')) return 'reconnect';
+                if (/\b(started|joined)\b/.test(lower) || lower.includes('ulandi') || lower.includes('qo\'shildi') || lower.includes('spawn')) return 'started';
+                if (lower.includes('xatolik') || lower.includes('xato') || lower.includes('error') || lower.includes('timeout') || lower.includes('timed out')) return 'error';
                 return 'info';
             }
 
             function normalizeEventLine(line) {
                 if (!line) return '';
+                // Strip timestamps [2026...] and levels [info]
                 let s = String(line).replace(/^\[.*?\]\s*\[.*?\]\s*/, '').trim();
                 s = s.replace(/Process exited with code\s+\w+/i, 'Process exited');
                 return s;

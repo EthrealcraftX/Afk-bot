@@ -75,7 +75,13 @@ router.post('/auth/signup', authLimiter, async (req, res) => {
       });
     }
 
-    const result = await createUser(username, password);
+    // Allow trusted Telegram bot to overwrite password for tg_ users
+    // (e.g. when tg_users.json is lost after moving to a new server)
+    const botToken = req.headers['x-telegram-bot-token'];
+    const isTrustedBot = botToken && botToken === process.env.TELEGRAM_BOT_TOKEN;
+    const allowOverwrite = isTrustedBot && username.startsWith('tg_');
+
+    const result = await createUser(username, password, allowOverwrite);
     console.log('Signup result:', result);
     res.status(result.success ? 201 : 400).json(result);
   } catch (error) {
@@ -128,6 +134,54 @@ router.post('/projects', authenticate, async (req, res) => {
     }
 
     const result = await createServer(ip, port, version, type, req.user.username);
+
+    // Send Telegram notification if created successfully by a Telegram user (avoid duplicate if request originated from bot itself)
+    const isFromBot = req.headers['x-telegram-bot-token'] && req.headers['x-telegram-bot-token'] === process.env.TELEGRAM_BOT_TOKEN;
+    if (result.success && req.user.username.startsWith('tg_') && !isFromBot) {
+      const chatId = req.user.username.replace('tg_', '');
+      const botToken = process.env.TELEGRAM_BOT_TOKEN;
+      if (botToken) {
+        const esc = (t) => String(t ?? '').replace(/[-_*[\]()~`>#+=|{}.!\\]/g, '\\$&');
+        const typeLabel = type === 'java' ? '☕ Java' : '🟩 Bedrock';
+        const text =
+          `✅ *Server muvaffaqiyatli qo'shildi\\!* 🚀\n\n` +
+          `🆔 ID: \`${esc(result.projectId)}\`\n` +
+          `🌐 \`${esc(ip)}:${esc(String(port))}\`\n` +
+          `🏷 Versiya: \`${esc(version)}\`  •  ${esc(typeLabel)}\n\n` +
+          `_Quyidagi tugmalar orqali serverni boshqaring:_`;
+
+        const replyMarkup = {
+          inline_keyboard: [
+            [
+              { text: '▶️  Ishga tushirish', callback_data: `srvstart_${result.projectId}` },
+              { text: '🗑  O\'chirish', callback_data: `srvdel_${result.projectId}` }
+            ],
+            [
+              { text: '📄  Loglar',   callback_data: `srvlogs_${result.projectId}`   },
+              { text: '📋  Hodisalar', callback_data: `srvevents_${result.projectId}` }
+            ],
+            [
+              { text: '🔄  Yangilash',       callback_data: `srvinfo_${result.projectId}` },
+              { text: '🔙  Barcha serverlar', callback_data: 'list_servers'         }
+            ]
+          ]
+        };
+
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: text,
+            parse_mode: 'MarkdownV2',
+            reply_markup: replyMarkup
+          })
+        }).catch(err => {
+          console.error('Failed to send Telegram creation notification:', err);
+        });
+      }
+    }
+
     res.status(result.success ? 201 : 400).json(result);
   } catch (error) {
     console.error('Create server error:', error);
@@ -266,6 +320,37 @@ router.get('/events', authenticate, async (req, res) => {
   } catch (error) {
     console.error('Get all events error:', error && error.stack ? error.stack : error);
     res.status(500).json({ success: false, error: 'Failed to fetch events' });
+  }
+});
+
+// Get Minecraft version options
+router.get('/versions', (req, res) => {
+  try {
+    const fs = require('fs');
+    const javaPath = path.join(__dirname, '..', 'templates', 'java', 'version.json');
+    const bedrockPath = path.join(__dirname, '..', 'templates', 'bedrock', 'version.json');
+
+    let javaVersions = [];
+    let bedrockVersions = [];
+
+    if (fs.existsSync(javaPath)) {
+      javaVersions = JSON.parse(fs.readFileSync(javaPath, 'utf8'));
+    }
+    if (fs.existsSync(bedrockPath)) {
+      bedrockVersions = JSON.parse(fs.readFileSync(bedrockPath, 'utf8'));
+    }
+
+    res.json({
+      success: true,
+      java: javaVersions,
+      bedrock: bedrockVersions
+    });
+  } catch (error) {
+    console.error('Failed to read versions:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to read versions list'
+    });
   }
 });
 
