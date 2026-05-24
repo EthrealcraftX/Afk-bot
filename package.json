@@ -27,10 +27,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/EthrealcraftX/afk-webpanel2.git"
+    "url": "git+https://github.com/EthrealcraftX/Afk-bot.git"
   },
   "bugs": {
-    "url": "https://github.com/EthrealcraftX/afk-webpanel2/issues"
+    "url": "https://github.com/EthrealcraftX/Afk-bot/issues"
   },
-  "homepage": "https://github.com/EthrealcraftX/afk-webpanel2#readme"
+  "homepage": "https://github.com/EthrealcraftX/Afk-bot#readme"
 }
