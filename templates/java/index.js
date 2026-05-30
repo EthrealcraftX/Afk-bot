@@ -20,6 +20,45 @@ if (usernames.length === 0) {
   usernames = ['JavaBot_' + Math.floor(1000 + Math.random() * 9000)];
 }
 
+// ── PLAYER STATE FILE ──────────────────────────────────────────────────────
+// Writes current player list to data/players/<projectId>.json so the panel
+// can display online player count and names via the Telegram bot.
+const projectId = config.projectId || path.basename(path.resolve(__dirname));
+const playersDir = path.join(__dirname, '..', '..', 'data', 'players');
+const playerStateFile = path.join(playersDir, `${projectId}.json`);
+
+function writePlayerState(botInstance) {
+  try {
+    if (!fs.existsSync(playersDir)) fs.mkdirSync(playersDir, { recursive: true });
+    let players = [];
+    if (botInstance && botInstance.players) {
+      players = Object.values(botInstance.players)
+        .map(p => p.username)
+        .filter(Boolean);
+    }
+    fs.writeFileSync(playerStateFile, JSON.stringify({
+      projectId,
+      count: players.length,
+      players,
+      updatedAt: new Date().toISOString()
+    }, null, 2));
+  } catch (e) {
+    console.error('Failed to write player state:', e.message);
+  }
+}
+
+function clearPlayerState() {
+  try {
+    if (!fs.existsSync(playersDir)) fs.mkdirSync(playersDir, { recursive: true });
+    fs.writeFileSync(playerStateFile, JSON.stringify({
+      projectId,
+      count: 0,
+      players: [],
+      updatedAt: new Date().toISOString()
+    }, null, 2));
+  } catch (e) {}
+}
+
 // Foydalanilgan usernamelarni saqlash
 const usedUsernames = new Set();
 
@@ -46,6 +85,7 @@ let connectAttempts = 0;
 
 // --- CLEANUP ---
 function cleanup() {
+  clearPlayerState();
   if (scheduledRestartTimer) {
     clearTimeout(scheduledRestartTimer);
     scheduledRestartTimer = null;
@@ -89,8 +129,7 @@ function startBot() {
     return;
   }
 
-  // Connection watchdog: if we can't connect, trigger automatic reconnect
-  // Since mineflayer starts connection immediately, we can use a connect timeout
+  // Connection watchdog
   const CONNECT_TIMEOUT = 25000;
   let connectTimeoutTimer = setTimeout(() => {
     console.error(`⌛ Connection timed out connecting to ${config.host}:${config.port}`);
@@ -104,9 +143,9 @@ function startBot() {
       clearTimeout(connectTimeoutTimer);
       connectTimeoutTimer = null;
     }
-    connectAttempts = 0; // reset attempts
+    connectAttempts = 0;
     
-    // Auto restart in 2 hours
+    // Auto restart in N hours
     const RECONNECT_HOURS = config.reconnectHours || 2;
     const RECONNECT_MS = RECONNECT_HOURS * 60 * 60 * 1000;
     scheduledRestartTimer = setTimeout(() => {
@@ -121,7 +160,19 @@ function startBot() {
       clearTimeout(connectTimeoutTimer);
       connectTimeoutTimer = null;
     }
+    writePlayerState(bot);
     startRandomActions();
+  });
+
+  // ── PLAYER LIST tracking ──
+  bot.on('playerJoined', (player) => {
+    console.log(`➕ Kirdi: ${player.username} | Jami: ${Object.keys(bot.players || {}).length} o'yinchi`);
+    writePlayerState(bot);
+  });
+
+  bot.on('playerLeft', (player) => {
+    console.log(`➖ Chiqdi: ${player.username} | Jami: ${Object.keys(bot.players || {}).length} o'yinchi`);
+    writePlayerState(bot);
   });
 
   bot.on('kicked', (reason) => {
@@ -149,7 +200,7 @@ function triggerReconnect(reason) {
   cleanup();
 
   connectAttempts = Math.min(connectAttempts + 1, 8);
-  const delay = Math.min(5000 * Math.pow(2, connectAttempts - 1), 3 * 1000 * 60); // 5s, 10s, 20s, 40s... up to 3min
+  const delay = Math.min(5000 * Math.pow(2, connectAttempts - 1), 3 * 1000 * 60);
 
   console.log(`🔁 Qayta ulanish rejalashtirildi. Sabab: "${reason}"`);
   console.log(`⌛ Kutish vaqti: ${Math.round(delay/1000)} soniya (Urinish #${connectAttempts})...`);
@@ -240,7 +291,6 @@ function startRandomActions() {
   }, config.movementInterval || 5000);
 }
 
-// Handle uncaught exceptions gracefully to prevent crash of panels background process
 process.on('uncaughtException', (err) => {
   console.error(`🔥 Unhandled Exception in Bot Process: ${err.message}`);
   console.error(err.stack);

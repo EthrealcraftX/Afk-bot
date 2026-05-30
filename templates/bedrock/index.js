@@ -23,6 +23,38 @@ const config = require('./config.json');
 const fs = require('fs');
 const path = require('path');
 
+// ── PLAYER STATE FILE ──────────────────────────────────────────────────────
+const projectId = config.projectId || path.basename(path.resolve(__dirname));
+const playersDir = path.join(__dirname, '..', '..', 'data', 'players');
+const playerStateFile = path.join(playersDir, `${projectId}.json`);
+
+function writePlayerState() {
+  try {
+    if (!fs.existsSync(playersDir)) fs.mkdirSync(playersDir, { recursive: true });
+    const players = Object.values(playerList).map(p => p.username).filter(Boolean);
+    fs.writeFileSync(playerStateFile, JSON.stringify({
+      projectId,
+      count: players.length,
+      players,
+      updatedAt: new Date().toISOString()
+    }, null, 2));
+  } catch (e) {
+    console.error('Failed to write player state:', e.message);
+  }
+}
+
+function clearPlayerState() {
+  try {
+    if (!fs.existsSync(playersDir)) fs.mkdirSync(playersDir, { recursive: true });
+    fs.writeFileSync(playerStateFile, JSON.stringify({
+      projectId,
+      count: 0,
+      players: [],
+      updatedAt: new Date().toISOString()
+    }, null, 2));
+  } catch (e) {}
+}
+
 let bot = null;
 let autoRestartTimer = null;
 let connectTimer = null;
@@ -34,6 +66,7 @@ let hasConnected = false;
 let tickCounter = BigInt(0);
 
 let botPosition = null;
+let playerList = {};
 
 function pickRandomUsernameFromFile() {
   try {
@@ -50,9 +83,11 @@ function pickRandomUsernameFromFile() {
 }
 
 function cleanup() {
+  clearPlayerState();
   hasConnected = false;
   botPosition = null;
   tickCounter = BigInt(0);
+  playerList = {};
 
   if (autoRestartTimer) { clearTimeout(autoRestartTimer); autoRestartTimer = null; }
   if (connectTimer) { clearTimeout(connectTimer); connectTimer = null; }
@@ -107,6 +142,28 @@ function createBot() {
     }, RECONNECT_MS);
 
     setupMovement();
+  });
+
+  bot.on('text', (packet) => {
+    const sender = packet.source_name || '';
+    const message = packet.message || '';
+    if (!sender || sender === bot.options.username) return;
+    console.log(color('green', `💬 [${sender}]: ${message}`));
+  });
+
+  bot.on('player_list', (packet) => {
+    if (!packet.records || !packet.records.records) return;
+    packet.records.records.forEach(player => {
+      if (packet.records.type === 'add') {
+        playerList[player.uuid] = { username: player.username, uuid: player.uuid };
+        console.log(color('cyan', `➕ Kirdi: ${player.username} | Jami: ${Object.keys(playerList).length} o'yinchi`));
+      } else {
+        const name = playerList[player.uuid]?.username || 'Noma\'lum';
+        delete playerList[player.uuid];
+        console.log(color('yellow', `➖ Chiqdi: ${name} | Jami: ${Object.keys(playerList).length} o'yinchi`));
+      }
+    });
+    writePlayerState();
   });
 
   bot.on('move_player', (packet) => {

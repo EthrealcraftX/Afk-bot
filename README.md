@@ -31,7 +31,7 @@ set JWT_SECRET=test
 set PORT=5000
 npm start
 ```
-3. Brauzerda ochish: `http://localhost:3000` yoki siz ishlatayotgan tunneling URL orqali.
+3. Brauzerda ochish: `http://localhost:5000` yoki siz ishlatayotgan tunneling URL orqali.
 
 ---
 

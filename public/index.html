@@ -513,6 +513,22 @@
             const closeEventsPopup = document.getElementById('closeEventsPopup');
             const eventsPopupDisableToggle = document.getElementById('eventsPopupDisableToggle');
 
+            function openEventsPopup() {
+                if (!eventsPopup) return;
+                eventsPopup.classList.remove('hidden');
+                eventsPopup.setAttribute('aria-hidden', 'false');
+                eventsPopup.removeAttribute('inert');
+                if (eventsPopupToggle) eventsPopupToggle.setAttribute('aria-expanded', 'true');
+            }
+
+            function closeEventsPopupFunc() {
+                if (!eventsPopup) return;
+                eventsPopup.classList.add('hidden');
+                eventsPopup.setAttribute('aria-hidden', 'true');
+                eventsPopup.setAttribute('inert', '');
+                if (eventsPopupToggle) eventsPopupToggle.setAttribute('aria-expanded', 'false');
+            }
+
             let popupsEnabled = (() => {
                 const v = localStorage.getItem('popupsEnabled');
                 return v === null ? true : v !== 'false';
@@ -529,8 +545,7 @@
                     if (!popupsEnabled) eventsPopupToggle.style.opacity = '0.5'; else eventsPopupToggle.style.opacity = '1';
                 }
                 if (!popupsEnabled && eventsPopup && !eventsPopup.classList.contains('hidden')) {
-                    eventsPopup.classList.add('hidden');
-                    eventsPopup.setAttribute('aria-hidden', 'true');
+                    closeEventsPopupFunc();
                 }
                 showToast(popupsEnabled ? 'Pop-ups enabled' : 'Pop-ups disabled', popupsEnabled ? 'success' : 'error');
             }
@@ -618,12 +633,10 @@
                 }
                 eventsPopupList.insertBefore(item, eventsPopupList.firstChild);
 
-                eventsPopup.classList.remove('hidden');
-                eventsPopup.setAttribute('aria-hidden', 'false');
+                openEventsPopup();
 
                 setTimeout(() => {
-                    eventsPopup.classList.add('hidden');
-                    eventsPopup.setAttribute('aria-hidden', 'true');
+                    closeEventsPopupFunc();
                 }, 5000);
             }
 
@@ -632,19 +645,16 @@
                     if (!eventsPopup) return;
                     const isHidden = eventsPopup.classList.contains('hidden');
                     if (isHidden) {
-                        eventsPopup.classList.remove('hidden');
-                        eventsPopup.setAttribute('aria-hidden', 'false');
+                        openEventsPopup();
                     } else {
-                        eventsPopup.classList.add('hidden');
-                        eventsPopup.setAttribute('aria-hidden', 'true');
+                        closeEventsPopupFunc();
                     }
                 });
             }
 
             if (closeEventsPopup) {
                 closeEventsPopup.addEventListener('click', () => {
-                    eventsPopup.classList.add('hidden');
-                    eventsPopup.setAttribute('aria-hidden', 'true');
+                    closeEventsPopupFunc();
                 });
             }
 

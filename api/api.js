@@ -196,6 +196,42 @@ async function startServer(projectId, username) {
     }
 
     const projectDir = path.join(__dirname, '../projects', projectId);
+
+    // If project directory is missing (e.g. after server restart), rebuild it from template
+    if (!fs.existsSync(projectDir) || !fs.existsSync(path.join(projectDir, 'index.js'))) {
+      console.log(`[startServer] Project dir missing for ${projectId}, rebuilding from template...`);
+      try {
+        fs.mkdirSync(projectDir, { recursive: true });
+
+        // Copy template files
+        const templateDir = path.join(__dirname, '../templates', project.type || 'java');
+        if (fs.existsSync(templateDir)) {
+          fs.cpSync(templateDir, projectDir, { recursive: true });
+        }
+
+        // Write config.json from MongoDB data
+        const config = {
+          projectId: project.projectId,
+          host: project.host,
+          port: project.port,
+          version: project.version,
+          type: project.type,
+          movementInterval: project.movementInterval || 5000,
+          reconnectHours: project.reconnectHours || 2,
+          usernameFile: project.usernameFile || 'usernames.txt',
+          actions: project.actions || ['jump', 'moveForward', 'lookAround'],
+          status: 'running',
+          owner: project.owner,
+          createdAt: project.createdAt
+        };
+        fs.writeFileSync(path.join(projectDir, 'config.json'), JSON.stringify(config, null, 2));
+        console.log(`[startServer] Project dir rebuilt for ${projectId}`);
+      } catch (rebuildErr) {
+        console.error(`[startServer] Failed to rebuild project dir for ${projectId}:`, rebuildErr);
+        return { success: false, error: 'Failed to rebuild project files' };
+      }
+    }
+
     let child;
     try {
       child = spawn('node', ['index.js'], {
@@ -682,6 +718,9 @@ async function initialize() {
     const requiredDirs = [
       path.join(__dirname, '../projects'),
       path.join(__dirname, '../data'),
+      path.join(__dirname, '../data/logs'),
+      path.join(__dirname, '../data/events'),
+      path.join(__dirname, '../data/players'),
       path.join(__dirname, '../templates/java'),
       path.join(__dirname, '../templates/bedrock')
     ];

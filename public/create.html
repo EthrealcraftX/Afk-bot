@@ -409,6 +409,32 @@
         // Port range is enforced by min="1" max="65535" attributes and submit-time validation.
         // (Live clamping on 'input' breaks copy-paste by rewriting the field mid-entry.)
 
+        function cleanIPAddress(ip) {
+            let cleanIp = ip.trim().toLowerCase();
+            
+            // Strip protocols (http://, https://) and www. if entered
+            cleanIp = cleanIp.replace(/^(https?:\/\/)?(www\.)?/, '');
+            
+            // Convert add.aternos.org/servername to servername.aternos.me
+            if (cleanIp.startsWith('add.aternos.org/')) {
+                const parts = cleanIp.split('/');
+                const serverName = parts[1];
+                if (serverName) {
+                    return `${serverName}.aternos.me`;
+                }
+            }
+            
+            return ip.trim();
+        }
+
+        // Live correction when user finishes typing and clicks away
+        const ipInput = document.getElementById('ip');
+        if (ipInput) {
+            ipInput.addEventListener('blur', () => {
+                ipInput.value = cleanIPAddress(ipInput.value);
+            });
+        }
+
         // Submit form creation request
         serverForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -418,8 +444,13 @@
 
             const token = localStorage.getItem('token') || '';
             const serverType = document.querySelector('input[name="type"]:checked').value;
+            
+            const rawIp = document.getElementById('ip').value;
+            const cleanedIp = cleanIPAddress(rawIp);
+            document.getElementById('ip').value = cleanedIp; // update visually
+
             const formData = {
-                ip: document.getElementById('ip').value.trim(),
+                ip: cleanedIp,
                 port: parseInt(portInput.value),
                 version: serverType === 'java'
                     ? javaVersionSelect.value

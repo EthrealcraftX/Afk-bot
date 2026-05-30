@@ -2,6 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
 const router = express.Router();
+const fs = require('fs');
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -12,6 +13,87 @@ const authLimiter = rateLimit({
 
 const { exec } = require('child_process');
 const path = require('path');
+
+// ── Group Announcement Helper ─────────────────────────────────────────────────
+const GROUP_CHATS_FILE = path.join(__dirname, '..', 'data', 'group_chats.json');
+const LAST_SERVER_FILE = path.join(__dirname, '..', 'data', 'last_server.json');
+
+/**
+ * Returns add.aternos.org/<name> URL if host matches *.aternos.me, else null.
+ */
+function getAtErnosJoinUrl(host) {
+  const match = String(host || '').match(/^([a-zA-Z0-9_-]+)\.aternos\.me$/i);
+  return match ? `https://add.aternos.org/${match[1]}` : null;
+}
+
+/**
+ * Reads group_chats.json and returns array of { chatId, title }.
+ */
+function getGroupChats() {
+  try {
+    if (!fs.existsSync(GROUP_CHATS_FILE)) return [];
+    const data = JSON.parse(fs.readFileSync(GROUP_CHATS_FILE, 'utf8'));
+    return Array.isArray(data) ? data : [];
+  } catch (e) { return []; }
+}
+
+/**
+ * Writes last_server.json so the bot process can answer group keyword queries.
+ */
+function saveLastServer(data) {
+  try {
+    const dir = path.dirname(LAST_SERVER_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(LAST_SERVER_FILE, JSON.stringify(data, null, 2));
+  } catch (e) {
+    console.error('[Routes] Failed to write last_server.json:', e);
+  }
+}
+
+/**
+ * Broadcasts server creation announcement to all registered Telegram groups.
+ */
+async function broadcastToGroups(botToken, projectId, ip, port, version, type, owner) {
+  const groups = getGroupChats();
+  if (!groups.length || !botToken) return;
+
+  const esc = (t) => String(t ?? '').replace(/[-_*[\]()~`>#+=|{}.!\\]/g, '\\$&');
+  const typeLabel  = type === 'java' ? '☕ Java' : '🟩 Bedrock';
+  const atErnosUrl = type === 'bedrock' ? getAtErnosJoinUrl(ip) : null;
+
+  const text =
+    `🆕 *Yangi server qo'shildi\\!*\n\n` +
+    `🌐 \`${esc(ip)}:${esc(String(port))}\`\n` +
+    `🏷 Versiya: \`${esc(version)}\`  •  ${esc(typeLabel)}\n` +
+    `📡 Status: 🔴 _Hali ishga tushirilmagan_\n` +
+    `👥 O'yinchilar: _Hali yo'q_` +
+    (atErnosUrl ? `\n\n🔗 Aternos: ${esc(atErnosUrl)}` : '');
+
+  const inline_keyboard = [];
+
+  // Aternos Bedrock join button
+  if (atErnosUrl) {
+    inline_keyboard.push([{
+      text: '🎮 Bedrock — Serverga kirish (Aternos)',
+      url: atErnosUrl
+    }]);
+  }
+
+  for (const group of groups) {
+    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: group.chatId,
+        text,
+        parse_mode: 'MarkdownV2',
+        reply_markup: inline_keyboard.length ? { inline_keyboard } : undefined
+      })
+    }).catch(err => {
+      console.error(`[Routes] Failed to send group announcement to ${group.chatId}:`, err.message);
+    });
+  }
+}
 
 const {
   createUser,
@@ -161,7 +243,10 @@ router.post('/projects', authenticate, async (req, res) => {
               { text: '📋  Hodisalar', callback_data: `srvevents_${result.projectId}` }
             ],
             [
-              { text: '🔄  Yangilash',       callback_data: `srvinfo_${result.projectId}` },
+              { text: '👥  O\'yinchilar', callback_data: `srvplayers_${result.projectId}` },
+              { text: '🔄  Yangilash',       callback_data: `srvinfo_${result.projectId}` }
+            ],
+            [
               { text: '🔙  Barcha serverlar', callback_data: 'list_servers'         }
             ]
           ]
@@ -180,6 +265,22 @@ router.post('/projects', authenticate, async (req, res) => {
           console.error('Failed to send Telegram creation notification:', err);
         });
       }
+    }
+
+    // ── Group broadcast + save last_server.json ──
+    if (result.success) {
+      const botToken = process.env.TELEGRAM_BOT_TOKEN;
+      saveLastServer({
+        projectId: result.projectId,
+        host: ip,
+        port: parseInt(port),
+        version,
+        type,
+        owner: req.user.username,
+        createdAt: new Date().toISOString()
+      });
+      broadcastToGroups(botToken, result.projectId, ip, port, version, type, req.user.username)
+        .catch(err => console.error('[Routes] broadcastToGroups error:', err));
     }
 
     res.status(result.success ? 201 : 400).json(result);
@@ -241,6 +342,41 @@ router.get('/projects/:id/status', authenticate, async (req, res) => {
       success: false,
       error: 'Internal server error'
     });
+  }
+});
+
+router.get('/projects/:id/players', authenticate, async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    if (!/^project_\d+(_[a-z0-9]+)?$/.test(projectId)) {
+      return res.status(400).json({ success: false, error: 'Invalid project id' });
+    }
+    const Project = require('./models/Project');
+    const project = await Project.findOne({ projectId });
+    if (!project) {
+      return res.status(404).json({ success: false, error: 'Server not found' });
+    }
+    if (project.owner !== req.user.username && req.user.username !== (process.env.ADMIN_USERNAME || 'admin')) {
+      return res.status(403).json({ success: false, error: 'Permission denied' });
+    }
+
+    const fs = require('fs');
+    const path = require('path');
+    const playersFile = path.join(__dirname, '..', 'data', 'players', `${projectId}.json`);
+
+    if (!fs.existsSync(playersFile)) {
+      return res.json({ success: true, count: 0, players: [] });
+    }
+
+    const data = JSON.parse(fs.readFileSync(playersFile, 'utf8'));
+    return res.json({
+      success: true,
+      count: data.count || 0,
+      players: data.players || []
+    });
+  } catch (error) {
+    console.error('Get players error:', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
 
