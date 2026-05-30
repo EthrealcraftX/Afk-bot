@@ -183,8 +183,8 @@ afk-bot/
 ### Step 1: Clone & Install Dependencies
 
 ```bash
-git clone https://github.com/EthrealcraftX/afk-webpanel2.git
-cd afk-bot
+git clone https://github.com/EthrealcraftX/Afk-bot.git
+cd Afk-bot
 npm install
 ```
 
@@ -203,7 +203,6 @@ TELEGRAM_BOT_TOKEN=your-telegram-bot-token
 MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/afk-bot
 
 # API Configuration
-BOT_API_URL=https://afk.hypepath.uz
 EXPO_PUBLIC_API_URL=https://afk.hypepath.uz
 
 # Admin Settings
@@ -543,7 +542,6 @@ npm run build
 - [ ] Performance dashboard with analytics
 - [ ] Advanced scheduling for server restarts
 - [ ] Custom server settings UI
-- [ ] Mobile app (React Native)
 - [ ] WebSocket real-time updates
 - [ ] Server backup/restore functionality
 - [ ] Multi-language support
@@ -582,7 +580,7 @@ Contributions are welcome! Please:
 ## 📧 Support
 
 For issues, questions, or suggestions:
-- **GitHub Issues:** [Open an issue](https://github.com/EthrealcraftX/afk-webpanel2/issues)
+- **GitHub Issues:** [Open an issue](https://github.com/EthrealcraftX/Afk-bot/issues)
 - **Telegram:** Use the `/help` command in the bot
 
 ---
