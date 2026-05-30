@@ -229,7 +229,7 @@ afk-bot/
 
 ```bash
 git clone https://github.com/EthrealcraftX/Afk-bot.git
-cd afk-bot
+cd Afk-bot
 npm install
 ```
 
@@ -248,11 +248,11 @@ TELEGRAM_BOT_TOKEN=your-telegram-bot-token
 MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/afk-bot
 
 # API Configuration
-BOT_API_URL=https://afk.hypepath.uz
-EXPO_PUBLIC_API_URL=https://afk.hypepath.uz
+EXPO_PUBLIC_API_URL=https://your.domain.com
 
 # Admin Settings
 ADMIN_USERNAME=admin
+ADMIN_PASSWORD=admin
 
 # Optional: Project Limits
 MAX_PROJECTS_PER_USER=3
