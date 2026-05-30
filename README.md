@@ -2,12 +2,13 @@
 
 **A comprehensive Minecraft server management system** with both a modern web dashboard and Telegram bot integration. Create, manage, and monitor Minecraft servers (Java & Bedrock) directly from your browser or Telegram.
 
-> **Qisqacha (Uzbek):** Bu loyiha — oddiy Minecraft serverlarni yaratish, yoqish, o'chirish va ularning loglari hamda voqealarini ko'rish uchun web-panel.
+> **Qisqacha (Uzbek):** Bu loyiha — oddiy Minecraft serverlarni qoshish, yoqish, o'chirish va ularning loglari hamda voqealarini ko'rish uchun web-panel.
 
 ---
 
 ## 📋 Table of Contents
 
+- [Quick Start](#quick-start)
 - [Features](#features)
 - [Project Structure](#project-structure)
 - [Tech Stack](#tech-stack)
@@ -19,6 +20,54 @@
 - [Scripts & Commands](#scripts--commands)
 - [Development](#development)
 - [Project Roadmap](#project-roadmap)
+
+---
+
+## ⚡ Quick Start
+
+### One-Command Startup
+
+**Windows:**
+```bash
+start.bat
+```
+
+**Linux/macOS:**
+```bash
+chmod +x start.sh
+./start.sh
+```
+
+### What the startup script does:
+✅ Checks Node.js and npm installation  
+✅ Verifies .env file exists (auto-creates template if missing)  
+✅ Installs dependencies (if needed)  
+✅ Validates all required environment variables  
+✅ **Automatically opens browser** at `http://localhost:3000`  
+✅ Starts Express server on port 3000
+
+### Starting the Telegram Bot (separate terminal)
+
+**Windows:**
+```bash
+bot.bat
+```
+
+**Linux/macOS:**
+```bash
+chmod +x bot.sh
+./bot.sh
+```
+
+### First Run Setup:
+1. Run the startup script (it will create `.env` if missing)
+2. Edit `.env` file with your credentials:
+   - `JWT_SECRET` — Any strong random string
+   - `TELEGRAM_BOT_TOKEN` — From [@BotFather](https://t.me/botfather)
+   - `MONGODB_URI` — From [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
+3. Run the startup script again
+4. Browser opens automatically at `http://localhost:3000`
+5. Create an account and log in!
 
 ---
 
@@ -100,10 +149,6 @@ afk-bot/
 │   │   └── signup.html      # Registration page
 │   ├── assets/              # Images, icons, etc.
 │   └── styles.css           # Global styles
-├── src/                      # React/TypeScript frontend (Vite)
-│   ├── App.tsx              # Main React component
-│   ├── main.tsx             # React entry point
-│   └── index.css            # Component styles
 ├── projects/                 # Active server instances
 │   ├── project_1775317753413/
 │   │   ├── config.json
@@ -183,7 +228,7 @@ afk-bot/
 ### Step 1: Clone & Install Dependencies
 
 ```bash
-git clone https://github.com/EthrealcraftX/afk-webpanel2.git
+git clone https://github.com/EthrealcraftX/Afk-bot.git
 cd afk-bot
 npm install
 ```
@@ -543,7 +588,6 @@ npm run build
 - [ ] Performance dashboard with analytics
 - [ ] Advanced scheduling for server restarts
 - [ ] Custom server settings UI
-- [ ] Mobile app (React Native)
 - [ ] WebSocket real-time updates
 - [ ] Server backup/restore functionality
 - [ ] Multi-language support
@@ -582,7 +626,7 @@ Contributions are welcome! Please:
 ## 📧 Support
 
 For issues, questions, or suggestions:
-- **GitHub Issues:** [Open an issue](https://github.com/EthrealcraftX/afk-webpanel2/issues)
+- **GitHub Issues:** [Open an issue](https://github.com/EthrealcraftX/Afk-bot/issues)
 - **Telegram:** Use the `/help` command in the bot
 
 ---

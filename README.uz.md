@@ -2,12 +2,13 @@
 
 **Minecraft serverlarini boshqarish uchun to'liq tizim** — zamonaviy veb-paneli va Telegram bot integratsiyasi bilan. Minecraft serverlarini (Java & Bedrock) brauzeringizdan yoki Telegramdan to'g'ridan-to'g'ri yaratib, boshqaring va kuzatib turing.
 
-> **Qisqacha:** Bu loyiha — oddiy Minecraft serverlarni yaratish, yoqish, o'chirish va ularning loglari hamda voqealarini ko'rish uchun web-panel.
+> **Qisqacha:** Bu loyiha — oddiy Minecraft serverlarni qoshish, yoqish, o'chirish va ularning loglari hamda voqealarini ko'rish uchun web-panel.
 
 ---
 
 ## 📋 Maqolalar
 
+- [Tezkor Boshlash](#tezkor-boshlash)
 - [Xususiyatlar](#xususiyatlar)
 - [Loyiha Tuzilishi](#loyiha-tuzilishi)
 - [Texnologiyalar](#texnologiyalar)
@@ -19,6 +20,54 @@
 - [Skriptlar va Buyruqlar](#skriptlar-va-buyruqlar)
 - [Ishlab Chiqish](#ishlab-chiqish)
 - [Loyiha Rejalari](#loyiha-rejalari)
+
+---
+
+## ⚡ Tezkor Boshlash
+
+### Bir Buyruq Bilan Ishga Tushirish
+
+**Windows:**
+```bash
+start.bat
+```
+
+**Linux/macOS:**
+```bash
+chmod +x start.sh
+./start.sh
+```
+
+### Boshlang'ich skript nima qiladi:
+✅ Node.js va npm o'rnatilganini tekshiradi  
+✅ .env fayling mavjudligini tekshiradi (agar yo'q bo'lsa, shablon yaratadi)  
+✅ Bog'liqliklarni o'rnatadi (agar kerak bo'lsa)  
+✅ Barcha talab qilinadigan muhit o'zgaruvchilarini tekshiradi  
+✅ **Avtomatik brauzerni ochadi** `http://localhost:3000` da  
+✅ Express serverni 3000-portda ishga tushiradi
+
+### Telegram Botni Ishga Tushirish (alohida terminal)
+
+**Windows:**
+```bash
+bot.bat
+```
+
+**Linux/macOS:**
+```bash
+chmod +x bot.sh
+./bot.sh
+```
+
+### Birinchi Ishga Tushirish Sozlamasi:
+1. Boshlang'ich skriptni ishga tushiring (.env yo'q bo'lsa, uni yaratadi)
+2. `.env` faylni taqdim etilgan ma'lumotlar bilan tahrirlang:
+   - `JWT_SECRET` — Istalgan kuchli tasodifiy satr
+   - `TELEGRAM_BOT_TOKEN` — [@BotFather](https://t.me/botfather) dan
+   - `MONGODB_URI` — [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) dan
+3. Boshlang'ich skriptni yana ishga tushiring
+4. Brauzer avtomatik ravishda `http://localhost:3000` da ochiladi
+5. Hisob yarating va tizimga kiring!
 
 ---
 
@@ -100,10 +149,6 @@ afk-bot/
 │   │   └── signup.html      # Ro'yxatdan o'tish sahifasi
 │   ├── assets/              # Rasmlar, ikonkalar, va boshqalar
 │   └── styles.css           # Global uslublar
-├── src/                      # React/TypeScript frontend (Vite)
-│   ├── App.tsx              # Asosiy React komponenti
-│   ├── main.tsx             # React kirish nuqtasi
-│   └── index.css            # Komponent uslublari
 ├── projects/                 # Faol server nusxalari
 │   ├── project_1775317753413/
 │   │   ├── config.json
@@ -183,7 +228,7 @@ afk-bot/
 ### 1-Qadam: Klonlash va Bog'liqliklarni O'rnatish
 
 ```bash
-git clone https://github.com/EthrealcraftX/afk-webpanel2.git
+git clone https://github.com/EthrealcraftX/Afk-bot.git
 cd afk-bot
 npm install
 ```
@@ -582,7 +627,7 @@ Hissalar qabul qilinadi! Iltimos:
 ## 📧 Qo'llab-Quv
 
 Muammolar, savollar yoki takliflar uchun:
-- **GitHub Masalalar:** [Masalani Oching](https://github.com/EthrealcraftX/afk-webpanel2/issues)
+- **GitHub Masalalar:** [Masalani Oching](https://github.com/EthrealcraftX/Afk-bot/issues)
 - **Telegram:** Botda `/help` buyrug'ini ishlating
 
 ---
