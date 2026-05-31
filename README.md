@@ -8,18 +8,18 @@
 
 ## 📋 Table of Contents
 
-- [Quick Start](#quick-start)
-- [Features](#features)
-- [Project Structure](#project-structure)
-- [Tech Stack](#tech-stack)
-- [Installation](#installation)
-- [Environment Variables](#environment-variables)
-- [Usage](#usage)
-- [API Reference](#api-reference)
-- [Database Schema](#database-schema)
-- [Scripts & Commands](#scripts--commands)
-- [Development](#development)
-- [Project Roadmap](#project-roadmap)
+- [Quick Start](#-quick-start)
+- [Features](#-features)
+- [Project Structure](#-project-structure)
+- [Tech Stack](#-tech-stack)
+- [Installation](#-installation)
+- [Environment Variables](#-environment-variables)
+- [Usage](#-usage)
+- [API Reference](#-api-reference)
+- [Database Schema](#-database-schema)
+- [Scripts & Commands](#-scripts--commands)
+- [Development](#-development)
+- [Project Roadmap](#-project-roadmap)
 
 ---
 
