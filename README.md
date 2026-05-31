@@ -25,40 +25,6 @@
 
 ## ⚡ Quick Start
 
-### One-Command Startup
-
-**Windows:**
-```bash
-start.bat
-```
-
-**Linux/macOS:**
-```bash
-chmod +x start.sh
-./start.sh
-```
-
-### What the startup script does:
-✅ Checks Node.js and npm installation  
-✅ Verifies .env file exists (auto-creates template if missing)  
-✅ Installs dependencies (if needed)  
-✅ Validates all required environment variables  
-✅ **Automatically opens browser** at `http://localhost:3000`  
-✅ Starts Express server on port 3000
-
-### Starting the Telegram Bot (separate terminal)
-
-**Windows:**
-```bash
-bot.bat
-```
-
-**Linux/macOS:**
-```bash
-chmod +x bot.sh
-./bot.sh
-```
-
 ### First Run Setup:
 1. Run the startup script (it will create `.env` if missing)
 2. Edit `.env` file with your credentials:
