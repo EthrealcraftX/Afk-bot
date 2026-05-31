@@ -8,56 +8,24 @@
 
 ## 📋 Maqolalar
 
-- [Tezkor Boshlash](#tezkor-boshlash)
-- [Xususiyatlar](#xususiyatlar)
-- [Loyiha Tuzilishi](#loyiha-tuzilishi)
-- [Texnologiyalar](#texnologiyalar)
-- [O'rnatish](#ornatish)
-- [Muhit O'zgaruvchilari](#muhit-ozgaruvchilari)
-- [Foydalanish](#foydalanish)
-- [API Ma'lumotlari](#api-malumotlari)
-- [Ma'lumotlar Bazasi Sxemasi](#malumotlar-bazasi-sxemasi)
-- [Skriptlar va Buyruqlar](#skriptlar-va-buyruqlar)
-- [Ishlab Chiqish](#ishlab-chiqish)
-- [Loyiha Rejalari](#loyiha-rejalari)
+- [Tezkor Boshlash](#-tezkor-boshlash)
+- [Xususiyatlar](#-xususiyatlar)
+- [Loyiha Tuzilishi](#-loyiha-tuzilishi)
+- [Texnologiyalar](#-texnologiyalar)
+- [O'rnatish](#-ornatish)
+- [Muhit O'zgaruvchilari](#-muhit-ozgaruvchilari)
+- [Foydalanish](#-foydalanish)
+- [API Ma'lumotlari](#-api-malumotlari)
+- [Ma'lumotlar Bazasi Sxemasi](#-malumotlar-bazasi-sxemasi)
+- [Skriptlar va Buyruqlar](#-skriptlar-va-buyruqlar)
+- [Ishlab Chiqish](#-ishlab-chiqish)
+- [Loyiha Rejalari](#-loyiha-rejalari)
 
 ---
 
 ## ⚡ Tezkor Boshlash
 
-### Bir Buyruq Bilan Ishga Tushirish
 
-**Windows:**
-```bash
-start.bat
-```
-
-**Linux/macOS:**
-```bash
-chmod +x start.sh
-./start.sh
-```
-
-### Boshlang'ich skript nima qiladi:
-✅ Node.js va npm o'rnatilganini tekshiradi  
-✅ .env fayling mavjudligini tekshiradi (agar yo'q bo'lsa, shablon yaratadi)  
-✅ Bog'liqliklarni o'rnatadi (agar kerak bo'lsa)  
-✅ Barcha talab qilinadigan muhit o'zgaruvchilarini tekshiradi  
-✅ **Avtomatik brauzerni ochadi** `http://localhost:3000` da  
-✅ Express serverni 3000-portda ishga tushiradi
-
-### Telegram Botni Ishga Tushirish (alohida terminal)
-
-**Windows:**
-```bash
-bot.bat
-```
-
-**Linux/macOS:**
-```bash
-chmod +x bot.sh
-./bot.sh
-```
 
 ### Birinchi Ishga Tushirish Sozlamasi:
 1. Boshlang'ich skriptni ishga tushiring (.env yo'q bo'lsa, uni yaratadi)
