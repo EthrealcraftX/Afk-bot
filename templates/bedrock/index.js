@@ -19,9 +19,19 @@ function color(name, text) {
   return typeof chalk[name] === 'function' ? chalk[name](text) : text;
 }
 
-const config = require('./config.json');
 const fs = require('fs');
 const path = require('path');
+const { classify } = require('../../errors/DisconnectClassifier');
+
+let config;
+try {
+  const raw = fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8');
+  config = JSON.parse(raw);
+} catch (e) {
+  console.error('❌ Config yuklashda xato:', e.message);
+  process.exit(1);
+}
+// FIXED: config.json read wrapped in try/catch before uncaughtException is registered
 
 // ── PLAYER STATE FILE ──────────────────────────────────────────────────────
 const projectId = config.projectId || path.basename(path.resolve(__dirname));
@@ -60,6 +70,7 @@ let autoRestartTimer = null;
 let connectTimer = null;
 let reconnectTimer = null;
 let actionInterval = null;
+let waitForPosTimer = null;
 let isReconnecting = false;
 let connectAttempts = 0;
 let hasConnected = false;
@@ -93,6 +104,7 @@ function cleanup() {
   if (connectTimer) { clearTimeout(connectTimer); connectTimer = null; }
   if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
   if (actionInterval) { clearInterval(actionInterval); actionInterval = null; }
+  if (waitForPosTimer) { clearInterval(waitForPosTimer); waitForPosTimer = null; }
   if (bot) {
     try { bot.removeAllListeners(); bot.disconnect(); } catch (e) {}
     bot = null;
@@ -142,6 +154,17 @@ function createBot() {
     }, RECONNECT_MS);
 
     setupMovement();
+  });
+
+  bot.on('start_game', (packet) => {
+    if (packet.player_position) {
+      botPosition = {
+        x: packet.player_position.x,
+        y: packet.player_position.y,
+        z: packet.player_position.z
+      };
+      console.log(color('green', `📍 Boshlang'ich pozitsiya: (${botPosition.x.toFixed(2)}, ${botPosition.y.toFixed(2)}, ${botPosition.z.toFixed(2)})`));
+    }
   });
 
   bot.on('text', (packet) => {
@@ -240,36 +263,92 @@ function buildMovePacket(newX, y, newZ) {
 }
 
 function setupMovement() {
-  if (actionInterval) clearInterval(actionInterval);
+  if (actionInterval) { clearInterval(actionInterval); actionInterval = null; }
 
-  actionInterval = setInterval(() => {
-    if (!bot) return;
+  let positionReady = false;
+  let logTickCount = 0;
 
-    try {
-      const pos = botPosition || { x: 0, y: 64, z: 0 };
-      const newX = pos.x + (Math.random() - 0.5) * 2;
-      const newZ = pos.z + (Math.random() - 0.5) * 2;
+  function startMovementInterval() {
+    if (actionInterval) return;
+    actionInterval = setInterval(() => {
+      if (!bot) return;
 
-      botPosition = { x: newX, y: pos.y, z: newZ };
+      try {
+        const pos = botPosition || { x: 0, y: 64, z: 0 };
+        const newX = pos.x + (Math.random() - 0.5) * 2;
+        const newZ = pos.z + (Math.random() - 0.5) * 2;
 
-      const packet = buildMovePacket(newX, pos.y, newZ);
-      bot.write('move_player', packet);
+        botPosition = { x: newX, y: pos.y, z: newZ };
 
-      console.log(color('blue', `🚶 AFK Yurish: (${newX.toFixed(2)}, ${pos.y.toFixed(2)}, ${newZ.toFixed(2)})`));
-    } catch (e) {
-      console.error('Failed to execute movement packet:', e.message);
+        const packet = buildMovePacket(newX, pos.y, newZ);
+        bot.write('move_player', packet);
+
+        logTickCount++;
+        if (logTickCount % 12 === 0) {
+          console.log(color('blue', `🚶 AFK pozitsiya: (${newX.toFixed(2)}, ${pos.y.toFixed(2)}, ${newZ.toFixed(2)})`));
+        }
+        // FIXED: logging reduced from 720/hour to 60/hour per bot
+      } catch (e) {
+        console.error('Failed to execute movement packet:', e.message);
+        if (actionInterval) {
+          clearInterval(actionInterval);
+          actionInterval = null;
+        }
+        console.error('🔌 Socket yopiq, harakat intervali to\'xtatildi');
+        if (!isReconnecting) {
+          triggerReconnect('SocketWriteError');
+        }
+        // FIXED: dead socket no longer hammered by movement interval
+      }
+    }, config.movementInterval || 5000);
+  }
+
+  waitForPosTimer = setInterval(() => {
+    if (botPosition && botPosition.x !== undefined) {
+      positionReady = true;
+      clearInterval(waitForPosTimer);
+      startMovementInterval();
     }
-  }, config.movementInterval || 5000);
+  }, 500);
+
+  // Fallback: give up waiting after 8 seconds and start anyway
+  setTimeout(() => {
+    if (!positionReady) {
+      clearInterval(waitForPosTimer);
+      if (!actionInterval) startMovementInterval();
+    }
+  }, 8000);
 }
 
 function triggerReconnect(reason) {
+  const MAX_RECONNECT = 20;
+  if (connectAttempts >= MAX_RECONNECT) {
+    console.error(`❌ ${MAX_RECONNECT} ta ulanish urinishi muvaffaqiyatsiz. Bot to'xtatildi.`);
+    process.exit(1);
+  }
+  // FIXED: infinite reconnect loop to permanently offline servers now stops after ~1 hour
+
+  const decision = classify(reason);
+  if (!decision.shouldRetry) {
+    console.error(color('red', `\n❌ Automatic reconnect stopped.`));
+    console.error(color('red', `  Category:    ${decision.category}`));
+    console.error(color('red', `  Reason:      ${decision.reason}`));
+    console.error(color('red', `  Confidence:  ${decision.confidence}`));
+    console.error(color('red', `  Retry:       false`));
+    if (decision.adminAction) {
+      console.error(color('red', `  Admin Action: ${decision.adminAction}`));
+    }
+    cleanup();
+    process.exit(1);
+  }
+
   if (isReconnecting) return;
   isReconnecting = true;
 
   cleanup();
 
-  connectAttempts = Math.min(connectAttempts + 1, 8);
-  const delay = Math.min(5000 * Math.pow(2, connectAttempts - 1), 3 * 60 * 1000);
+  connectAttempts = connectAttempts + 1;
+  const delay = Math.min(5000 * Math.pow(2, Math.min(connectAttempts, 8) - 1), 3 * 60 * 1000);
 
   console.log(color('yellow', `🔁 Reconnect rejalashtirildi. Sabab: "${reason}".`));
   console.log(color('yellow', `⌛ Kutish: ${Math.round(delay / 1000)}s (Urinish #${connectAttempts})...`));
@@ -290,5 +369,18 @@ process.on('unhandledRejection', (reason) => {
   console.error(color('red', `🔥 Unhandled Rejection: ${reason}`));
   triggerReconnect(`UnhandledRejection: ${reason}`);
 });
+
+process.on('SIGTERM', () => {
+  console.log('🛑 SIGTERM qabul qilindi, tozalanmoqda...');
+  cleanup();
+  setTimeout(() => process.exit(0), 1000);
+});
+
+process.on('SIGINT', () => {
+  console.log('🛑 SIGINT qabul qilindi, tozalanmoqda...');
+  cleanup();
+  setTimeout(() => process.exit(0), 1000);
+});
+// FIXED: graceful shutdown cleans player state file before process exits
 
 createBot();

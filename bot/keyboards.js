@@ -65,7 +65,32 @@ function kbServer(projectId, status) {
         { text: '🔄  Yangilash',       callback_data: `srvinfo_${projectId}` }
       ],
       [
+        { text: '✏️  Botni tahrirlash', callback_data: `srvedit_${projectId}` }
+      ],
+      [
         { text: '🔙  Barcha serverlar', callback_data: 'list_servers'         }
+      ]
+    ]
+  };
+}
+
+/**
+ * Keyboard for the /edit reply — contains only the Web App edit button.
+ * @param {string} projectId
+ * @param {string} token  - user JWT for the edit URL
+ */
+function kbEditMiniApp(projectId, token) {
+  const { WEB_APP_URL, IS_HTTPS } = require('./config');
+  const url = `${WEB_APP_URL}/edit?token=${encodeURIComponent(token)}&project=${encodeURIComponent(projectId)}`;
+  const button = IS_HTTPS 
+    ? { text: '✏️ Bot edit qilish', web_app: { url } }
+    : { text: '✏️ Bot edit qilish (Brauzerda)', url };
+
+  return {
+    inline_keyboard: [
+      [ button ],
+      [
+        { text: '🔙  Serverga qaytish', callback_data: `srvinfo_${projectId}` }
       ]
     ]
   };
@@ -151,6 +176,7 @@ module.exports = {
   kbVersions,
   kbMain,
   kbServer,
+  kbEditMiniApp,
   kbBack,
   kbCancel,
   kbCancelAdmin,

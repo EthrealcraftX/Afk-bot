@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { atomicWriteJsonSync } = require('./atomicFs');
 
 const GROUP_CHATS_FILE = path.join(__dirname, '..', 'data', 'group_chats.json');
 
@@ -25,7 +26,7 @@ function registerGroupChat(chatId, title) {
         title: title || 'Unknown',
         addedAt: new Date().toISOString()
       });
-      fs.writeFileSync(GROUP_CHATS_FILE, JSON.stringify(groups, null, 2));
+      atomicWriteJsonSync(GROUP_CHATS_FILE, groups);
       console.log(`[GroupStore] Registered group: ${chatId} (${title})`);
     }
   } catch (e) {
@@ -38,7 +39,7 @@ function removeGroupChat(chatId) {
     const groups = getGroupChats();
     const filtered = groups.filter(g => g.chatId !== String(chatId));
     if (filtered.length < groups.length) {
-      fs.writeFileSync(GROUP_CHATS_FILE, JSON.stringify(filtered, null, 2));
+      atomicWriteJsonSync(GROUP_CHATS_FILE, filtered);
       console.log(`[GroupStore] Removed group: ${chatId}`);
     }
   } catch (e) {

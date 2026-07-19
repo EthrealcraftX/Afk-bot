@@ -3,79 +3,524 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Block Not Found</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>404 - Chunk Not Found</title>
+    <link rel="stylesheet" href="/styles.css">
     <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Press+Start+2P&display=swap');
+
+        :root {
+            --m-green: #00ff88;
+            --m-purple: #a855f7;
+            --m-bg: #050508;
+            --m-card-border: rgba(168, 85, 247, 0.15);
+        }
+
         body {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             padding: 24px;
             box-sizing: border-box;
-            background-color: var(--bg-primary);
+            background-color: var(--m-bg);
+            font-family: var(--font-sans);
+            color: var(--text-primary);
+            overflow: hidden;
+            position: relative;
         }
 
-        .error-card {
-            text-align: center;
-            max-width: 500px;
+        /* Ambient glowing background */
+        .ambient-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, rgba(0, 255, 136, 0.05) 50%, transparent 100%);
+            z-index: 1;
+            pointer-events: none;
+            filter: blur(80px);
+        }
+
+        /* Starry/Particle Canvas */
+        #particleCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 48px 32px;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
         }
 
-        .error-icon {
-            font-size: 4rem;
-            color: var(--accent-red);
-            margin-bottom: 24px;
-            text-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
-            animation: pulseGlow 2s infinite alternate;
+        /* CRT Scanlines Overlay */
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            z-index: 5;
+            pointer-events: none;
+            opacity: 0.4;
         }
 
-        @keyframes pulseGlow {
+        /* Glassmorphic Containment Card */
+        .error-container {
+            position: relative;
+            z-index: 10;
+            background: rgba(10, 10, 16, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--m-card-border);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 
+                        0 0 40px rgba(168, 85, 247, 0.05),
+                        inset 0 0 20px rgba(255, 255, 255, 0.01);
+            max-width: 650px;
+            width: 100%;
+            padding: 48px;
+            text-align: center;
+            transition: var(--transition-normal);
+            animation: containerEntry 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes containerEntry {
             from {
-                text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
-                transform: scale(0.98);
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
             }
             to {
-                text-shadow: 0 0 25px rgba(239, 68, 68, 0.6);
-                transform: scale(1.02);
+                opacity: 1;
+                transform: translateY(0) scale(1);
             }
         }
 
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 16px;
-            color: #ffffff;
-            letter-spacing: -0.03em;
+        .error-container:hover {
+            border-color: rgba(0, 255, 136, 0.25);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 
+                        0 0 50px rgba(0, 255, 136, 0.08);
         }
 
-        p {
-            color: var(--text-secondary);
-            font-size: 1rem;
+        /* 3D Scene for Rotating Cube */
+        .scene {
+            width: 130px;
+            height: 130px;
+            perspective: 600px;
+            margin: 0 auto 36px;
+        }
+
+        .cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-20deg) rotateY(35deg);
+            animation: rotateCube 16s infinite linear;
+            cursor: pointer;
+        }
+
+        .cube:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes rotateCube {
+            0% { transform: rotateX(-20deg) rotateY(0deg); }
+            100% { transform: rotateX(-20deg) rotateY(360deg); }
+        }
+
+        .cube-face {
+            position: absolute;
+            width: 130px;
+            height: 130px;
+            border: 2px solid rgba(168, 85, 247, 0.4);
+            background: rgba(15, 10, 25, 0.7);
+            backdrop-filter: blur(2px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Press Start 2P', monospace;
+            font-weight: bold;
+            font-size: 2.2rem;
+            color: #ffffff;
+            text-shadow: 0 0 12px rgba(168, 85, 247, 0.8);
+            box-shadow: inset 0 0 25px rgba(168, 85, 247, 0.3);
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        /* Cube colors transition on hover */
+        .cube:hover .cube-face {
+            border-color: rgba(0, 255, 136, 0.5);
+            color: #ffffff;
+            text-shadow: 0 0 12px rgba(0, 255, 136, 0.8);
+            box-shadow: inset 0 0 25px rgba(0, 255, 136, 0.3);
+            background: rgba(10, 20, 15, 0.75);
+        }
+
+        .cube-face-front  { transform: rotateY(0deg) translateZ(65px); }
+        .cube-face-right  { transform: rotateY(90deg) translateZ(65px); }
+        .cube-face-back   { transform: rotateY(180deg) translateZ(65px); }
+        .cube-face-left   { transform: rotateY(-90deg) translateZ(65px); }
+        .cube-face-top    { transform: rotateX(90deg) translateZ(65px); }
+        .cube-face-bottom { transform: rotateX(-90deg) translateZ(65px); }
+
+        /* Retro Minecraft Gaming Header */
+        .retro-title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.1rem;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Large error message */
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0 0 16px 0;
+            letter-spacing: -0.03em;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .glitch-text {
+            position: relative;
+            animation: textGlitch 4s infinite;
+        }
+
+        @keyframes textGlitch {
+            0%, 95%, 100% {
+                text-shadow: none;
+            }
+            96% {
+                text-shadow: 2px -1px var(--m-green), -2px 1px var(--m-purple);
+            }
+            97% {
+                text-shadow: -2px -2px var(--m-green), 2px 2px var(--m-purple);
+            }
+            98% {
+                text-shadow: 1px 2px var(--m-green), -1px -2px var(--m-purple);
+            }
+            99% {
+                text-shadow: none;
+            }
+        }
+
+        p.description {
+            color: #ffffff;
+            font-size: 1.05rem;
             line-height: 1.6;
-            margin-bottom: 32px;
+            margin: 0 auto 32px;
+            max-width: 480px;
+        }
+
+        /* In-game Retro Console / Diagnostic Logs */
+        .diagnostic-console {
+            background: rgba(0, 0, 0, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-md);
+            padding: 18px 24px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            text-align: left;
+            margin-bottom: 36px;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+            border-left: 3px solid var(--m-purple);
+            transition: border-color 0.3s ease;
+        }
+
+        .error-container:hover .diagnostic-console {
+            border-left-color: var(--m-green);
+        }
+
+        .console-line {
+            display: flex;
+            margin-bottom: 6px;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .console-line:last-child {
+            margin-bottom: 0;
+        }
+
+        .console-prompt {
+            color: var(--m-purple);
+            margin-right: 8px;
+            font-weight: bold;
+            user-select: none;
+        }
+
+        .error-container:hover .console-prompt {
+            color: var(--m-green);
+        }
+
+        .console-text {
+            color: #ffffff;
+        }
+
+        .console-text.highlight {
+            color: var(--accent-amber);
+            font-weight: 500;
+        }
+
+        .console-text.fail {
+            color: var(--accent-red);
+            font-weight: 600;
+        }
+
+        /* Buttons Panel */
+        .buttons-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
         .btn {
-            font-size: 1rem;
-            padding: 12px 24px;
+            font-family: var(--font-sans);
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 14px 28px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition-normal);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            border: none;
+            outline: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Custom green gaming button */
+        .btn-respawn {
+            background: linear-gradient(135deg, #00b862 0%, #00ff88 100%);
+            color: #050b07;
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.25);
+        }
+
+        .btn-respawn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4), 
+                        0 0 15px rgba(0, 255, 136, 0.2);
+            color: #000;
+        }
+
+        .btn-respawn:active {
+            transform: translateY(0);
+        }
+
+        /* Outline custom secondary button */
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 580px) {
+            .error-container {
+                padding: 32px 20px;
+            }
+            h1 {
+                font-size: 2.2rem;
+            }
+            .buttons-group {
+                flex-direction: column;
+                width: 100%;
+            }
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="error-card glass-card">
-        <div class="error-icon">
-            <i class="fa-solid fa-cube"></i>
+    <div class="ambient-glow"></div>
+    <div class="scanlines"></div>
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="error-container">
+        <!-- Rotating 3D Block -->
+        <div class="scene">
+            <div class="cube" id="blockCube">
+                <div class="cube-face cube-face-front">4</div>
+                <div class="cube-face cube-face-back">4</div>
+                <div class="cube-face cube-face-left">0</div>
+                <div class="cube-face cube-face-right">0</div>
+                <div class="cube-face cube-face-top">?</div>
+                <div class="cube-face cube-face-bottom">!</div>
+            </div>
         </div>
-        <h1>404</h1>
-        <p>The block you are looking for does not exist in this world.</p>
-        <button class="btn btn-primary" onclick="window.location.href='/'">
-            <i class="fa-solid fa-house"></i> Return to Home
-        </button>
+
+        <div class="retro-title">
+            <i class="fa-solid fa-triangle-exclamation"></i> Chunk Not Found
+        </div>
+        <h1>
+            <span class="glitch-text">404</span>
+        </h1>
+        <p class="description">
+            You fell out of the world! The chunk you are trying to load does not exist, has been unloaded, or coordinates point directly to the void.
+        </p>
+
+        <!-- Dynamic Diagnostics Console -->
+        <div class="diagnostic-console">
+            <div class="console-line">
+                <span class="console-prompt">&gt;</span>
+                <span class="console-text">Locating player coordinates...</span>
+            </div>
+            <div class="console-line">
+                <span class="console-prompt">&gt;</span>
+                <span class="console-text">X: <span class="highlight">404.000</span>, Y: <span class="fail">-64.000 (Void)</span>, Z: <span class="highlight">404.000</span></span>
+            </div>
+            <div class="console-line">
+                <span class="console-prompt">&gt;</span>
+                <span class="console-text">Loading chunk state: <span class="console-text fail">FAILED_UNLOADED</span></span>
+            </div>
+            <div class="console-line">
+                <span class="console-prompt">&gt;</span>
+                <span class="console-text" id="statusLine">Checking connection to main server... OK</span>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="buttons-group">
+            <a href="/" class="btn btn-respawn">
+                <i class="fa-solid fa-gamepad"></i> Respawn
+            </a>
+            <a href="/create" class="btn btn-secondary">
+                <i class="fa-solid fa-plus"></i> Generate New Server
+            </a>
+        </div>
     </div>
+
+    <script>
+        // Interactive 3D Cube Spin Accelerate on hover/click
+        const cube = document.getElementById('blockCube');
+        let currentSpeed = 16; // animation duration in seconds
+        
+        cube.addEventListener('mousedown', () => {
+            cube.style.animation = 'rotateCube 3s infinite linear';
+        });
+
+        cube.addEventListener('mouseup', () => {
+            cube.style.animation = `rotateCube ${currentSpeed}s infinite linear`;
+        });
+
+        // 2D Canvas Square Particles (Minecraft Portal & Slime theme)
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.size = Math.random() * 8 + 4; // Square sizes
+                this.x = Math.random() * width;
+                this.y = height + this.size;
+                this.speedY = -(Math.random() * 1.5 + 0.5);
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.opacity = Math.random() * 0.5 + 0.1;
+                // Color choices: Green (slime) or Purple (portal)
+                this.color = Math.random() > 0.5 ? '168, 85, 247' : '0, 255, 136';
+                this.rotation = Math.random() * Math.PI;
+                this.rotSpeed = (Math.random() - 0.5) * 0.02;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.rotation += this.rotSpeed;
+                this.opacity -= 0.0015;
+
+                if (this.opacity <= 0 || this.y < -this.size) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.fillStyle = `rgba(${this.color}, ${this.opacity})`;
+                ctx.shadowBlur = Math.random() * 10 + 5;
+                ctx.shadowColor = `rgb(${this.color})`;
+                // Draw square (Minecraft pixelated style)
+                ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+                ctx.restore();
+            }
+        }
+
+        const particleCount = 45;
+        const particles = Array.from({ length: particleCount }, () => new Particle());
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // Simple interactive console terminal text change over time
+        const statusLine = document.getElementById('statusLine');
+        const phrases = [
+            "Checking connection to main server... OK",
+            "Pinging portal gateway... RESPONSE_TIMED_OUT",
+            "Running memory diagnostics... OK",
+            "Allocating virtual chunks... OUT_OF_BOUNDS",
+            "Checking admin clearance... ACCEPTED",
+            "Syncing with local bots... ONLINE"
+        ];
+        let index = 0;
+        setInterval(() => {
+            index = (index + 1) % phrases.length;
+            statusLine.textContent = phrases[index];
+            if (phrases[index].includes("OUT_OF_BOUNDS") || phrases[index].includes("RESPONSE_TIMED_OUT")) {
+                statusLine.className = "console-text fail";
+            } else if (phrases[index].includes("ACCEPTED") || phrases[index].includes("ONLINE")) {
+                statusLine.className = "console-text highlight";
+            } else {
+                statusLine.className = "console-text";
+            }
+        }, 5000);
+    </script>
 </body>
 </html>

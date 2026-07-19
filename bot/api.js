@@ -1,8 +1,10 @@
 const { API_URL } = require('./config');
 
+const INTERNAL_API_TIMEOUT_MS = 10000;
+
 async function api(method, endpoint, body, token) {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000);
+  const timeoutId = setTimeout(() => controller.abort(), INTERNAL_API_TIMEOUT_MS);
 
   try {
     const headers = { 'Content-Type': 'application/json' };

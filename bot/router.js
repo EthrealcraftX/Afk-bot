@@ -14,7 +14,8 @@ const {
   handleServerEvents,
   handleAllEvents,
   handleStats,
-  handleServerPlayers
+  handleServerPlayers,
+  handleEditServer
 } = require('./handlers/servers');
 
 const {
@@ -75,10 +76,12 @@ function initRouter() {
   });
 
   bot.on('callback_query', async (query) => {
-    const chatId = query.message.chat.id;
-    const msgId  = query.message.message_id;
-    const data   = query.data;
-    const sess   = getSession(chatId);
+    // FIXED: Wrap callback_query handler in try/catch to prevent bot crash
+    try {
+      const chatId = query.message.chat.id;
+      const msgId  = query.message.message_id;
+      const data   = query.data;
+      const sess   = getSession(chatId);
 
     sess.lastMsgId = msgId;
     // Do not auto-answer custom alerts/popups, handle them inside the handler
@@ -88,6 +91,8 @@ function initRouter() {
 
     // ── Group version info popup (non-interactive informational) ──────────────
     if (data === 'gver_header') {
+      // FIXED: Answer callback query immediately to prevent client spinner hang
+      bot.answerCallbackQuery(query.id).catch(() => {});
       await bot.deleteMessage(chatId, msgId).catch(() => {});
       const text = `🎮 *Minecraft Platformasini Tanlang\\:*`;
       await bot.sendMessage(chatId, text, {
@@ -104,6 +109,8 @@ function initRouter() {
       return;
     }
     if (data === 'gshow_java' || data === 'gshow_bedrock') {
+      // FIXED: Answer callback query immediately to prevent client spinner hang
+      bot.answerCallbackQuery(query.id).catch(() => {});
       const type = data === 'gshow_java' ? 'java' : 'bedrock';
       const label = type === 'java' ? '☕ Java Edition' : '🟩 Bedrock Edition';
       
@@ -166,6 +173,8 @@ function initRouter() {
       return;
     }
     if (data.startsWith('gver_')) {
+      // FIXED: Answer callback query immediately to prevent client spinner hang
+      bot.answerCallbackQuery(query.id).catch(() => {});
       const version = data.slice(5);
       
       // Determine the type based on the active state or the previous message
@@ -281,8 +290,28 @@ function initRouter() {
     if (data.startsWith('srvlogs_'))    return handleServerLogs(chatId, sess, msgId, data.slice(8));
     if (data.startsWith('srvevents_'))  return handleServerEvents(chatId, sess, msgId, data.slice(10));
     if (data.startsWith('srvplayers_')) return handleServerPlayers(chatId, sess, msgId, data.slice(11));
+    if (data.startsWith('srvedit_'))    return handleEditServer(chatId, sess, msgId, data.slice(8));
     if (data.startsWith('settype_'))    return handleSetType(chatId, sess, data.slice(8));
     if (data.startsWith('setversion_')) return handleSetVersion(chatId, sess, msgId, data.slice(11));
+
+    // ── help_request: callback (Yordam so'rash button on error notification) ──
+    if (data.startsWith('help_request:')) {
+      const botId = data.slice(13);
+      // Try to get the bot name from DB for a nicer message
+      let botLabel = botId;
+      try {
+        const Project = require('../api/models/Project');
+        const proj = await Project.findOne({ projectId: botId });
+        if (proj) botLabel = `${proj.host}:${proj.port}`;
+      } catch (_) {}
+      await bot.sendMessage(chatId,
+        `🆘 *Yordam so'rovi yuborildi\!*\n` +
+        `Bot: \`${esc(botLabel)}\`\n\n` +
+        `Qo'llab\-quvvatlash guruhiga murojaat qiling yoki administrator bilan bog'laning\.`,
+        { parse_mode: 'MarkdownV2' }
+      );
+      return;
+    }
 
     // ── Admin ──
     if (data === 'admin_panel')      return handleAdminPanel(chatId, sess, msgId);
@@ -304,13 +333,19 @@ function initRouter() {
     if (data.startsWith('ticket_'))   return handleTicketView(chatId, sess, msgId, parseInt(data.slice(7)));
     if (data.startsWith('treply_'))   return startTicketReply(chatId, sess, parseInt(data.slice(7)));
     if (data.startsWith('tclose_'))   return handleTicketClose(chatId, sess, msgId, parseInt(data.slice(7)));
+    } catch (err) {
+      console.error('Error in callback_query handler:', err);
+      bot.answerCallbackQuery(query.id).catch(() => {});
+    }
   });
 
   bot.on('message', async (msg) => {
-    if (msg.text?.startsWith('/')) return;
+    // FIXED: Wrap message handler in try/catch to prevent bot crash
+    try {
+      if (msg.text?.startsWith('/')) return;
 
-    const chatId   = msg.chat.id;
-    const chatType = msg.chat.type; // 'private', 'group', 'supergroup', 'channel'
+      const chatId   = msg.chat.id;
+      const chatType = msg.chat.type; // 'private', 'group', 'supergroup', 'channel'
 
     // ── Group/Channel: only handle keyword detection ──────────────────────────
     if (chatType === 'group' || chatType === 'supergroup') {
@@ -352,7 +387,15 @@ function initRouter() {
 
     const text = (msg.text ?? '').trim();
 
-    if (!sess.state || !text) return;
+    if (!sess.state || !text) {
+      const { isServerAddress, handleStatusCheck } = require('./status/handler');
+      if (text && isServerAddress(text)) {
+        return handleStatusCheck(bot, chatId, text).catch((err) => {
+          console.error('[StatusCheck] Failed in router:', err.message);
+        });
+      }
+      return;
+    }
 
     const state = sess.state;
 
@@ -374,6 +417,22 @@ function initRouter() {
     if (state === 'broadcast_text')  return wizardBroadcastText(chatId, sess, text);
     if (state === 'ticket_reply')    return wizardTicketReply(chatId, sess, text);
     if (state.startsWith('admvers_add_input_')) return handleAddVersionInput(chatId, sess, text, state.slice(18));
+    } catch (err) {
+      console.error('Error in message handler:', err);
+    }
+  });
+
+  // Track edited messages to trigger the smart group observer again
+  bot.on('edited_message', async (msg) => {
+    try {
+      if (msg.chat && (msg.chat.type === 'group' || msg.chat.type === 'supergroup')) {
+        await handleGroupMessage(msg).catch(e =>
+          console.error('[Router] handleGroupMessage edited error:', e.message)
+        );
+      }
+    } catch (err) {
+      console.error('Error in edited_message handler:', err);
+    }
   });
 }
 

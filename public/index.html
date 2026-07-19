@@ -108,12 +108,31 @@
 
             <!-- Drawer Controls -->
             <div class="events-toggle-group" style="position: fixed; bottom: 24px; right: 24px; display: flex; gap: 8px; z-index: 999;">
-                <button id="eventsPopupToggle" class="btn btn-primary" style="border-radius: 50%; width: 48px; height: 48px; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg);" title="Show recent activities" aria-controls="eventsPopup" aria-expanded="false">
+                <button id="eventsPopupToggle" class="btn btn-primary" style="border-radius: 50%; width: 48px; height: 48px; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg); position: relative;" title="Show recent activities" aria-controls="eventsPopup" aria-expanded="false">
                     <i class="fa-solid fa-bell"></i>
+                </button>
+                <!-- Notification error bell -->
+                <button id="notifToggleBtn" class="btn btn-ghost" style="border-radius: 50%; width: 48px; height: 48px; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg); position: relative;" title="Bot error notifications" aria-label="Bot error notifications">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span id="notifBadge" class="notif-badge" aria-label="unread notifications" style="display:none;">0</span>
                 </button>
                 <button id="eventsPopupDisableToggle" class="btn btn-ghost" style="border-radius: 50%; width: 48px; height: 48px; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg);" title="Toggle Activity Pop-ups" aria-pressed="false" aria-label="Toggle notifications">
                     <i class="fa-solid fa-bell-slash"></i>
                 </button>
+            </div>
+
+            <!-- Bot Error Notifications Panel -->
+            <div id="notifPanel" class="notif-panel hidden" role="dialog" aria-modal="false" aria-labelledby="notifPanelLabel" inert>
+                <div class="notif-panel-header">
+                    <span id="notifPanelLabel"><i class="fa-solid fa-triangle-exclamation"></i> Bot Notifications</span>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <button id="notifMarkAllBtn" class="btn btn-ghost small-btn" title="Mark all as read"><i class="fa-solid fa-check-double"></i> Mark all read</button>
+                        <button id="notifCloseBtn" class="btn btn-ghost small-btn" aria-label="Close notifications"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+                <div id="notifList" class="notif-list" aria-live="polite">
+                    <div class="notif-empty"><i class="fa-solid fa-circle-check"></i><p>No bot errors. All systems OK.</p></div>
+                </div>
             </div>
 
             <!-- Global Toast Container -->
@@ -125,8 +144,58 @@
         </footer>
     </div>
 
+    <!-- ── Edit Server Modal ──────────────────────────────────────────── -->
+    <div id="editModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="editModalTitle" inert>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="editModalTitle"><i class="fa-solid fa-pen-to-square"></i> Edit Server</h2>
+                <button id="editCloseBtn" class="btn btn-ghost modal-close-btn" aria-label="Close edit modal" type="button">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="editForm" autocomplete="off">
+                <input type="hidden" id="editServerId">
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="editIp" class="form-label">Server IP / Host</label>
+                        <input type="text" id="editIp" class="form-input" placeholder="e.g. play.example.com or 192.168.1.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPort" class="form-label">Port</label>
+                        <input type="number" id="editPort" class="form-input" placeholder="25565" min="1" max="65535" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editVersion" class="form-label">Version</label>
+                        <select id="editVersion" class="form-input" required>
+                            <option value="">Loading versions…</option>
+                        </select>
+                    </div>
+                    <p id="editModalError" class="modal-error-msg" aria-live="assertive"></p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" id="editCancelBtn" class="btn btn-ghost">Cancel</button>
+                    <button type="submit" id="editSaveBtn" class="btn btn-primary">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
+            // ── Telegram Mini App auto-login: read token from URL if present ──
+            const _urlParams = new URLSearchParams(window.location.search);
+            const _urlToken = _urlParams.get('token');
+            if (_urlToken) {
+                localStorage.setItem('token', _urlToken);
+                // Clean token from URL bar (don't expose it in history)
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
             const token = localStorage.getItem('token') || '';
             const logoutBtn = document.getElementById('logoutBtn');
             
@@ -324,6 +393,9 @@
                                     <button class="btn btn-danger stop-btn" onclick="stopServer('${id}')" ${server.status === 'stopped' ? 'disabled' : ''}>
                                         <i class="fa-solid fa-stop"></i> Stop
                                     </button>
+                                    <button class="btn btn-ghost edit-btn" onclick="openEditModal('${id}')" ${server.status === 'running' ? 'disabled' : ''} title="Edit configuration">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </button>
                                     <button class="btn btn-ghost delete-btn" onclick="deleteServer('${id}')">
                                         <i class="fa-solid fa-trash-can"></i>
                                     </button>
@@ -354,6 +426,7 @@
                                 const statusIndicator = serverCard.querySelector('.status-indicator');
                                 const startBtn = serverCard.querySelector('.start-btn');
                                 const stopBtn = serverCard.querySelector('.stop-btn');
+                                const editBtn = serverCard.querySelector('.edit-btn');
                                 
                                 if (statusIndicator) {
                                     statusIndicator.className = `status-indicator ${server.status === 'running' ? 'status-running' : 'status-stopped'}`;
@@ -361,6 +434,7 @@
                                 }
                                 if (startBtn) startBtn.disabled = server.status === 'running';
                                 if (stopBtn) stopBtn.disabled = server.status === 'stopped';
+                                if (editBtn) editBtn.disabled = server.status === 'running';
                             }
                         }
                     }
@@ -875,11 +949,361 @@
                 }, 3500);
             }
 
+            // ── Edit Modal Logic ──────────────────────────────────────────
+            let editVersionsCache = null;
+
+            async function loadVersionsCache() {
+                if (editVersionsCache) return editVersionsCache;
+                try {
+                    const activeToken = localStorage.getItem('token');
+                    const res = await fetch('/api/versions', {
+                        headers: { 'Authorization': `Bearer ${activeToken}` }
+                    });
+                    if (!res.ok) throw new Error('versions fetch failed');
+                    const j = await res.json();
+                    editVersionsCache = {
+                        java: Array.isArray(j.java) ? j.java : [],
+                        bedrock: Array.isArray(j.bedrock) ? j.bedrock : []
+                    };
+                } catch (err) {
+                    console.error('Failed to load versions:', err);
+                    editVersionsCache = { java: [], bedrock: [] };
+                }
+                return editVersionsCache;
+            }
+
+            const editModal       = document.getElementById('editModal');
+            const editForm        = document.getElementById('editForm');
+            const editServerIdEl  = document.getElementById('editServerId');
+            const editIpEl        = document.getElementById('editIp');
+            const editPortEl      = document.getElementById('editPort');
+            const editVersionEl   = document.getElementById('editVersion');
+            const editSaveBtn     = document.getElementById('editSaveBtn');
+            const editCancelBtn   = document.getElementById('editCancelBtn');
+            const editCloseBtn    = document.getElementById('editCloseBtn');
+            const editModalError  = document.getElementById('editModalError');
+
+            async function openEditModal(id) {
+                const server = allProjects[id];
+                if (!server) {
+                    showToast('Server not found. Please refresh.', 'error');
+                    return;
+                }
+                if (server.status === 'running') {
+                    showToast('Cannot edit while the bot is running. Stop it first.', 'error');
+                    return;
+                }
+
+                // Populate fields
+                editServerIdEl.value = id;
+                editIpEl.value       = server.host || '';
+                editPortEl.value     = server.port || '';
+                if (editModalError) editModalError.textContent = '';
+
+                // Load versions and fill dropdown
+                const versions = await loadVersionsCache();
+                const list = server.type === 'java' ? versions.java : versions.bedrock;
+                editVersionEl.innerHTML = '';
+                if (list.length === 0) {
+                    // Fallback: let user type
+                    editVersionEl.innerHTML = `<option value="${escapeHTML(server.version)}">${escapeHTML(server.version)}</option>`;
+                } else {
+                    list.forEach(v => {
+                        const opt = document.createElement('option');
+                        opt.value = v;
+                        opt.textContent = v;
+                        if (v === server.version) opt.selected = true;
+                        editVersionEl.appendChild(opt);
+                    });
+                }
+
+                // Update modal title to show type
+                const typeLabel = server.type === 'java' ? 'Java' : 'Bedrock';
+                const titleEl = document.getElementById('editModalTitle');
+                if (titleEl) titleEl.textContent = `Edit Server — ${typeLabel} Edition`;
+
+                // Reveal
+                editModal.classList.remove('hidden');
+                editModal.removeAttribute('inert');
+                editIpEl.focus();
+            }
+
+            function closeEditModalFunc() {
+                if (!editModal) return;
+                editModal.classList.add('hidden');
+                editModal.setAttribute('inert', '');
+            }
+
+            if (editCloseBtn)  editCloseBtn.addEventListener('click',  closeEditModalFunc);
+            if (editCancelBtn) editCancelBtn.addEventListener('click', closeEditModalFunc);
+
+            // Close modal when clicking backdrop
+            if (editModal) {
+                editModal.addEventListener('click', (e) => {
+                    if (e.target === editModal) closeEditModalFunc();
+                });
+            }
+
+            // Close on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && editModal && !editModal.classList.contains('hidden')) {
+                    closeEditModalFunc();
+                }
+            });
+
+            if (editForm) {
+                editForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+
+                    const id      = editServerIdEl.value.trim();
+                    const ip      = editIpEl.value.trim();
+                    const port    = editPortEl.value.trim();
+                    const version = editVersionEl.value.trim();
+
+                    // Client-side validation
+                    if (!ip || !port || !version) {
+                        if (editModalError) editModalError.textContent = 'All fields are required.';
+                        return;
+                    }
+                    const portNum = parseInt(port, 10);
+                    if (isNaN(portNum) || portNum < 1 || portNum > 65535) {
+                        if (editModalError) editModalError.textContent = 'Port must be a number between 1 and 65535.';
+                        return;
+                    }
+
+                    if (editModalError) editModalError.textContent = '';
+                    editSaveBtn.disabled = true;
+                    editSaveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
+
+                    try {
+                        const activeToken = localStorage.getItem('token');
+                        const res = await fetch(`/api/projects/${id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `Bearer ${activeToken}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ ip, port: portNum, version })
+                        });
+
+                        const data = await res.json();
+                        if (data.success) {
+                            showToast('Server configuration updated!', 'success');
+                            closeEditModalFunc();
+                            await refreshServers(true);
+                        } else {
+                            if (editModalError) editModalError.textContent = data.error || 'Update failed.';
+                            showToast(data.error || 'Failed to update server.', 'error');
+                        }
+                    } catch (err) {
+                        if (editModalError) editModalError.textContent = 'Network error: ' + err.message;
+                        showToast('Network error. Please try again.', 'error');
+                    } finally {
+                        editSaveBtn.disabled = false;
+                        editSaveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
+                    }
+                });
+            }
+
             // Expose globally for inline onclick handlers
-            window.startServer = startServer;
-            window.stopServer = stopServer;
-            window.deleteServer = deleteServer;
+            window.startServer    = startServer;
+            window.stopServer     = stopServer;
+            window.deleteServer   = deleteServer;
+            // Navigate to the dedicated /edit page instead of opening the inline modal
+            window.openEditModal  = function(id) {
+                const tok = localStorage.getItem('token') || '';
+                window.location.href = `/edit?project=${encodeURIComponent(id)}&token=${encodeURIComponent(tok)}`;
+            };
+
+            // ── Bot Error Notification System ─────────────────────────────
+            const notifPanel      = document.getElementById('notifPanel');
+            const notifList       = document.getElementById('notifList');
+            const notifBadge      = document.getElementById('notifBadge');
+            const notifToggleBtn  = document.getElementById('notifToggleBtn');
+            const notifCloseBtn   = document.getElementById('notifCloseBtn');
+            const notifMarkAllBtn = document.getElementById('notifMarkAllBtn');
+
+            let _notifPanelOpen = false;
+
+            function openNotifPanel() {
+                if (!notifPanel) return;
+                notifPanel.classList.remove('hidden');
+                notifPanel.removeAttribute('inert');
+                _notifPanelOpen = true;
+                if (notifToggleBtn) notifToggleBtn.setAttribute('aria-expanded', 'true');
+            }
+
+            function closeNotifPanel() {
+                if (!notifPanel) return;
+                notifPanel.classList.add('hidden');
+                notifPanel.setAttribute('inert', '');
+                _notifPanelOpen = false;
+                if (notifToggleBtn) notifToggleBtn.setAttribute('aria-expanded', 'false');
+            }
+
+            if (notifToggleBtn) {
+                notifToggleBtn.addEventListener('click', () => {
+                    if (_notifPanelOpen) { closeNotifPanel(); } else {
+                        openNotifPanel();
+                        fetchNotifications(); // refresh on open
+                    }
+                });
+            }
+            if (notifCloseBtn) notifCloseBtn.addEventListener('click', closeNotifPanel);
+
+            // Close on Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && _notifPanelOpen) closeNotifPanel();
+            });
+
+            // ── Helpers ──────────────────────────────────────────────────
+            function timeAgo(dateStr) {
+                const now  = Date.now();
+                const then = new Date(dateStr).getTime();
+                const diff = Math.max(0, now - then);
+                const s  = Math.floor(diff / 1000);
+                const m  = Math.floor(s / 60);
+                const h  = Math.floor(m / 60);
+                const d  = Math.floor(h / 24);
+                if (d > 0)  return `${d}d ago`;
+                if (h > 0)  return `${h}h ago`;
+                if (m > 0)  return `${m}m ago`;
+                return 'just now';
+            }
+
+            function severityIcon(severity) {
+                switch (severity) {
+                    case 'error':   return '<i class="fa-solid fa-circle-xmark" style="color:var(--accent-red);"></i>';
+                    case 'warning': return '<i class="fa-solid fa-triangle-exclamation" style="color:var(--accent-amber);"></i>';
+                    default:        return '<i class="fa-solid fa-circle-info" style="color:#3b82f6;"></i>';
+                }
+            }
+
+            function renderNotifications(notifications) {
+                if (!notifList) return;
+                if (!notifications || notifications.length === 0) {
+                    notifList.innerHTML = '<div class="notif-empty"><i class="fa-solid fa-circle-check"></i><p>No bot errors. All systems OK.</p></div>';
+                    return;
+                }
+
+                notifList.innerHTML = notifications.map(n => {
+                    const readClass = n.isRead ? 'notif-item--read' : '';
+                    const ago       = timeAgo(n.createdAt);
+                    const icon      = severityIcon(n.severity);
+                    const pid       = n.projectId ? `<span class="notif-project-id">${escapeHTML(n.projectId)}</span>` : '';
+                    return `
+                    <div class="notif-item ${readClass} notif-sev-${escapeHTML(n.severity)}" data-id="${escapeHTML(String(n._id))}" role="article">
+                        <div class="notif-item-header">
+                            <span class="notif-item-icon">${icon}</span>
+                            <span class="notif-item-title">${escapeHTML(n.title)}</span>
+                            <span class="notif-item-time">${escapeHTML(ago)}</span>
+                            <button class="notif-dismiss-btn" data-id="${escapeHTML(String(n._id))}" title="Dismiss" aria-label="Dismiss notification">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        ${pid}
+                        <p class="notif-item-msg">${escapeHTML(n.message)}</p>
+                        ${n.suggestion ? `<p class="notif-item-suggestion"><i class="fa-solid fa-lightbulb"></i> ${escapeHTML(n.suggestion)}</p>` : ''}
+                    </div>`.trim();
+                }).join('');
+
+                // Mark-as-read on item click (anywhere except dismiss)
+                notifList.querySelectorAll('.notif-item:not(.notif-item--read)').forEach(el => {
+                    el.addEventListener('click', async (e) => {
+                        if (e.target.closest('.notif-dismiss-btn')) return;
+                        const id = el.dataset.id;
+                        if (!id) return;
+                        el.classList.add('notif-item--read');
+                        const tok = localStorage.getItem('token');
+                        try {
+                            await fetch(`/api/notifications/${id}/read`, {
+                                method: 'PATCH',
+                                headers: { 'Authorization': `Bearer ${tok}` }
+                            });
+                            await fetchNotifications();
+                        } catch (e) { /* silent */ }
+                    });
+                });
+
+                // Dismiss buttons
+                notifList.querySelectorAll('.notif-dismiss-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const id = btn.dataset.id;
+                        if (!id) return;
+                        const tok = localStorage.getItem('token');
+                        btn.disabled = true;
+                        try {
+                            await fetch(`/api/notifications/${id}`, {
+                                method: 'DELETE',
+                                headers: { 'Authorization': `Bearer ${tok}` }
+                            });
+                            await fetchNotifications();
+                        } catch (err) {
+                            btn.disabled = false;
+                        }
+                    });
+                });
+            }
+
+            function updateBadge(count) {
+                if (!notifBadge) return;
+                if (count > 0) {
+                    notifBadge.textContent = count > 99 ? '99+' : String(count);
+                    notifBadge.style.display = 'flex';
+                    if (notifToggleBtn) {
+                        notifToggleBtn.classList.remove('btn-ghost');
+                        notifToggleBtn.classList.add('btn-danger');
+                    }
+                } else {
+                    notifBadge.style.display = 'none';
+                    if (notifToggleBtn) {
+                        notifToggleBtn.classList.remove('btn-danger');
+                        notifToggleBtn.classList.add('btn-ghost');
+                    }
+                }
+            }
+
+            async function fetchNotifications() {
+                const tok = localStorage.getItem('token');
+                if (!tok || tok === 'null') return;
+                try {
+                    const res = await fetch('/api/notifications?limit=50', {
+                        headers: { 'Authorization': `Bearer ${tok}` }
+                    });
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    if (!data.success) return;
+                    updateBadge(data.unreadCount || 0);
+                    if (_notifPanelOpen) {
+                        renderNotifications(data.notifications || []);
+                    }
+                } catch (e) { /* fail silently */ }
+            }
+
+            // Mark all as read
+            if (notifMarkAllBtn) {
+                notifMarkAllBtn.addEventListener('click', async () => {
+                    const tok = localStorage.getItem('token');
+                    if (!tok) return;
+                    notifMarkAllBtn.disabled = true;
+                    try {
+                        await fetch('/api/notifications/read-all', {
+                            method: 'PATCH',
+                            headers: { 'Authorization': `Bearer ${tok}` }
+                        });
+                        await fetchNotifications();
+                    } catch (e) { /* silent */ } finally {
+                        notifMarkAllBtn.disabled = false;
+                    }
+                });
+            }
+
+            // Initial fetch + 30-second poll
+            fetchNotifications();
+            setInterval(fetchNotifications, 30000);
         });
+
     </script>
 </body>
 </html>

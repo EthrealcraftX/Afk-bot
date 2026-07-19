@@ -1,7 +1,8 @@
 const context = require('../context');
 const api = require('../api');
-const { knownChatIds, supportTickets, loadVersions, saveVersions, getOpenTicketCount } = require('../store');
+const { knownChatIds, supportTickets, loadVersions, saveVersions, saveTickets, getOpenTicketCount } = require('../store');
 const { sessions } = require('../session');
+const { ensureTelegramAuth } = require('../auth');
 const { kbAdminPanel, kbAdminBack, kbBroadcastConfirm, kbBack, kbCancelAdmin } = require('../keyboards');
 const { esc, fmtTime } = require('../formatters');
 const { editOrSend } = require('../ui');
@@ -12,6 +13,9 @@ function isAdminUser(sess) {
 }
 
 async function handleAdminPanel(chatId, sess, msgId) {
+  // Refresh token before admin operations
+  await ensureTelegramAuth(chatId, sess);
+
   if (!isAdminUser(sess)) {
     return editOrSend(chatId, msgId,
       `🚫 *Ruxsat yo'q*\n\n_Admin huquqlari talab etiladi\\._`,
@@ -34,6 +38,9 @@ async function handleAdminPanel(chatId, sess, msgId) {
 }
 
 async function handleAdminServers(chatId, sess, msgId) {
+  // Refresh token before making API calls
+  await ensureTelegramAuth(chatId, sess);
+
   if (!isAdminUser(sess)) return handleAdminPanel(chatId, sess, msgId);
 
   const result = await api('GET', '/projects', null, sess.token);
@@ -91,6 +98,7 @@ async function handleAdminServers(chatId, sess, msgId) {
 }
 
 async function handleAdminUsers(chatId, sess, msgId) {
+  await ensureTelegramAuth(chatId, sess);
   if (!isAdminUser(sess)) return handleAdminPanel(chatId, sess, msgId);
 
   const users = Array.from(knownChatIds.entries());
@@ -195,6 +203,7 @@ async function executeBroadcast(chatId, sess, msgId) {
 }
 
 async function handleSupportList(chatId, sess, msgId) {
+  await ensureTelegramAuth(chatId, sess);
   if (!isAdminUser(sess)) return handleAdminPanel(chatId, sess, msgId);
 
   const open   = supportTickets.filter(t => !t.closed);
@@ -303,6 +312,7 @@ async function wizardTicketReply(chatId, sess, text) {
   ticket.replied   = true;
   ticket.replyText = text;
   ticket.replyAt   = new Date();
+  saveTickets(); // persist reply to disk
 
   try {
     await context.bot.sendMessage(ticket.chatId,
@@ -351,6 +361,7 @@ async function handleTicketClose(chatId, sess, msgId, ticketId) {
   }
 
   ticket.closed = true;
+  saveTickets(); // persist close to disk
 
   try {
     await context.bot.sendMessage(ticket.chatId,

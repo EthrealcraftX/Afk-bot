@@ -1,10 +1,19 @@
 const mineflayer = require('mineflayer');
 const path = require('path');
 const fs = require('fs');
+const { classify } = require('../../errors/DisconnectClassifier');
 
 // Config faylni o'qish
 const configPath = path.join(__dirname, 'config.json');
-const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+let config;
+try {
+  const raw = fs.readFileSync(configPath, 'utf8');
+  config = JSON.parse(raw);
+} catch (e) {
+  console.error('❌ Config yuklashda xato:', e.message);
+  process.exit(1);
+}
+// FIXED: config.json read wrapped in try/catch before uncaughtException is registered
 
 // Usernamelarni fayldan o'qish
 let usernames = [];
@@ -36,12 +45,16 @@ function writePlayerState(botInstance) {
         .map(p => p.username)
         .filter(Boolean);
     }
-    fs.writeFileSync(playerStateFile, JSON.stringify({
+    const data = {
       projectId,
       count: players.length,
       players,
       updatedAt: new Date().toISOString()
-    }, null, 2));
+    };
+    fs.writeFile(playerStateFile, JSON.stringify({...data}), 'utf8', (err) => {
+      if (err) console.error('❌ Player state yozishda xato:', err.message);
+    });
+    // FIXED: player state writes no longer block the event loop
   } catch (e) {
     console.error('Failed to write player state:', e.message);
   }
@@ -82,9 +95,12 @@ let scheduledRestartTimer = null;
 let actionInterval = null;
 let isReconnecting = false;
 let connectAttempts = 0;
+let connectTimeoutTimer = null;
 
 // --- CLEANUP ---
 function cleanup() {
+  if (connectTimeoutTimer) { clearTimeout(connectTimeoutTimer); connectTimeoutTimer = null; }
+  // FIXED: watchdog timer cleared on cleanup to prevent duplicate reconnect
   clearPlayerState();
   if (scheduledRestartTimer) {
     clearTimeout(scheduledRestartTimer);
@@ -125,13 +141,19 @@ function startBot() {
     });
   } catch (err) {
     console.error(`⚠️ Bot yaratish xatosi: ${err.message}`);
+    const lowerMsg = (err.message || '').toLowerCase();
+    if (lowerMsg.includes('version') || lowerMsg.includes('protocol') || lowerMsg.includes('unsupported') || lowerMsg.includes('invalid version')) {
+      console.error('❌ Versiya xatosi — qayta ulanish to\'xtatildi:', err.message);
+      process.exit(1);
+    }
+    // FIXED: invalid version exits cleanly instead of retrying forever with same bad version
     triggerReconnect(`CreationError: ${err.message}`);
     return;
   }
 
   // Connection watchdog
   const CONNECT_TIMEOUT = 25000;
-  let connectTimeoutTimer = setTimeout(() => {
+  connectTimeoutTimer = setTimeout(() => {
     console.error(`⌛ Connection timed out connecting to ${config.host}:${config.port}`);
     triggerReconnect('ConnectTimeout');
   }, CONNECT_TIMEOUT);
@@ -166,11 +188,15 @@ function startBot() {
 
   // ── PLAYER LIST tracking ──
   bot.on('playerJoined', (player) => {
+    if (!bot) return;
+    // FIXED: handlers no longer run after cleanup sets bot to null
     console.log(`➕ Kirdi: ${player.username} | Jami: ${Object.keys(bot.players || {}).length} o'yinchi`);
     writePlayerState(bot);
   });
 
   bot.on('playerLeft', (player) => {
+    if (!bot) return;
+    // FIXED: handlers no longer run after cleanup sets bot to null
     console.log(`➖ Chiqdi: ${player.username} | Jami: ${Object.keys(bot.players || {}).length} o'yinchi`);
     writePlayerState(bot);
   });
@@ -183,6 +209,13 @@ function startBot() {
 
   bot.on('error', (err) => {
     console.log('⚠️ Bot kutilmagan xatolikka duch keldi (Error):', err.message || err);
+    const errMsg = err.message || '';
+    const lowerMsg = errMsg.toLowerCase();
+    if (lowerMsg.includes('version') || lowerMsg.includes('protocol') || lowerMsg.includes('unsupported') || lowerMsg.includes('invalid version')) {
+      console.error('❌ Versiya xatosi — qayta ulanish to\'xtatildi:', errMsg);
+      process.exit(1);
+    }
+    // FIXED: invalid version exits cleanly instead of retrying forever with same bad version
     triggerReconnect(`ErrorEvent: ${err.message || 'unknown'}`);
   });
 
@@ -190,17 +223,67 @@ function startBot() {
     console.log('🔌 Server bilan ulanish uzildi (End).');
     triggerReconnect('ConnectionEnd');
   });
+
+  bot.on('death', () => {
+    console.log('💀 Bot o\'ldi, qayta tug\'ilish...');
+    setTimeout(() => {
+      try { if (bot && bot.entity) bot.respawn(); } catch (e) {}
+    }, 1500);
+  });
+  // FIXED: bot no longer stuck in death screen for up to 2 hours
+
+  bot.on('health', () => {
+    if (!bot) return;
+    if (bot.food === 0) {
+      console.log('🍖 Ovqat tugadi (food=0)');
+    }
+    if (bot.health <= 2) {
+      console.log('❤️ Sog\'liq kritik darajada:', bot.health);
+    }
+  });
+  // FIXED: health and starvation now monitored
+
+  bot.on('messagestr', (message) => {
+    console.log('💬 Server xabari:', message);
+    const lower = message.toLowerCase();
+    if (lower.includes('afk') || lower.includes('kick') || lower.includes('you will be')) {
+      console.log('⚠️ AFK ogohlantirishi aniqlandi, harakat bajarilmoqda...');
+      try { if (bot && bot.entity) bot.look(Math.random() * Math.PI * 2, 0, true); } catch (e) {}
+    }
+  });
+  // FIXED: bot now detects AFK warnings and kick countdowns in chat
 }
 
 // Qayta ulanish funktsiyasi
 function triggerReconnect(reason) {
+  const MAX_RECONNECT = 20;
+  if (connectAttempts >= MAX_RECONNECT) {
+    console.error(`❌ ${MAX_RECONNECT} ta ulanish urinishi muvaffaqiyatsiz. Bot to'xtatildi.`);
+    process.exit(1);
+  }
+  // FIXED: infinite reconnect loop to permanently offline servers now stops after ~1 hour
+
+  const decision = classify(reason);
+  if (!decision.shouldRetry) {
+    console.error(`\n❌ Automatic reconnect stopped.`);
+    console.error(`  Category:    ${decision.category}`);
+    console.error(`  Reason:      ${decision.reason}`);
+    console.error(`  Confidence:  ${decision.confidence}`);
+    console.error(`  Retry:       false`);
+    if (decision.adminAction) {
+      console.error(`  Admin Action: ${decision.adminAction}`);
+    }
+    cleanup();
+    process.exit(1);
+  }
+
   if (isReconnecting) return;
   isReconnecting = true;
 
   cleanup();
 
-  connectAttempts = Math.min(connectAttempts + 1, 8);
-  const delay = Math.min(5000 * Math.pow(2, connectAttempts - 1), 3 * 1000 * 60);
+  connectAttempts = connectAttempts + 1;
+  const delay = Math.min(5000 * Math.pow(2, Math.min(connectAttempts, 8) - 1), 3 * 1000 * 60);
 
   console.log(`🔁 Qayta ulanish rejalashtirildi. Sabab: "${reason}"`);
   console.log(`⌛ Kutish vaqti: ${Math.round(delay/1000)} soniya (Urinish #${connectAttempts})...`);
@@ -240,46 +323,89 @@ function startRandomActions() {
     if (!bot) return;
     
     try {
-      const actions = config.actions || ["jump", "moveForward", "lookAround"];
+      const actions = config.actions || ["jump", "moveForward", "lookAround", "sneak"];
       const randomAction = actions[Math.floor(Math.random() * actions.length)];
       
       switch(randomAction) {
-        case 'jump':
-          bot.setControlState('jump', true);
-          setTimeout(() => { if (bot) bot.setControlState('jump', false); }, 500);
+        case 'jump': {
+          const currentBot = bot; // FIXED: capture now, not inside timer
+          currentBot.setControlState('jump', true);
+          setTimeout(() => {
+            try {
+              if (currentBot && currentBot.entity) currentBot.setControlState('jump', false);
+            } catch (e) {}
+          }, 500);
           console.log('🚶 AFK Harakat: Sakrash (Jump)');
           break;
+        }
           
-        case 'moveForward':
-          bot.setControlState('forward', true);
-          setTimeout(() => { if (bot) bot.setControlState('forward', false); }, 1000);
+        case 'moveForward': {
+          const currentBot = bot; // FIXED: capture now, not inside timer
+          currentBot.setControlState('forward', true);
+          setTimeout(() => {
+            try {
+              if (currentBot && currentBot.entity) currentBot.setControlState('forward', false);
+            } catch (e) {}
+          }, 1000);
           console.log('🚶 AFK Harakat: Oldinga yurish (MoveForward)');
           break;
+        }
           
-        case 'moveBackward':
-          bot.setControlState('back', true);
-          setTimeout(() => { if (bot) bot.setControlState('back', false); }, 1000);
+        case 'moveBackward': {
+          const currentBot = bot; // FIXED: capture now, not inside timer
+          currentBot.setControlState('back', true);
+          setTimeout(() => {
+            try {
+              if (currentBot && currentBot.entity) currentBot.setControlState('back', false);
+            } catch (e) {}
+          }, 1000);
           console.log('🚶 AFK Harakat: Orqaga yurish (MoveBackward)');
           break;
+        }
           
-        case 'strafeLeft':
-          bot.setControlState('left', true);
-          setTimeout(() => { if (bot) bot.setControlState('left', false); }, 1000);
+        case 'strafeLeft': {
+          const currentBot = bot; // FIXED: capture now, not inside timer
+          currentBot.setControlState('left', true);
+          setTimeout(() => {
+            try {
+              if (currentBot && currentBot.entity) currentBot.setControlState('left', false);
+            } catch (e) {}
+          }, 1000);
           console.log('🚶 AFK Harakat: Chapga siljish (StrafeLeft)');
           break;
+        }
           
-        case 'strafeRight':
-          bot.setControlState('right', true);
-          setTimeout(() => { if (bot) bot.setControlState('right', false); }, 1000);
+        case 'strafeRight': {
+          const currentBot = bot; // FIXED: capture now, not inside timer
+          currentBot.setControlState('right', true);
+          setTimeout(() => {
+            try {
+              if (currentBot && currentBot.entity) currentBot.setControlState('right', false);
+            } catch (e) {}
+          }, 1000);
           console.log('🚶 AFK Harakat: O\'ngga siljish (StrafeRight)');
           break;
+        }
+
+        case 'sneak': {
+          const sneakBot = bot;
+          sneakBot.setControlState('sneak', true);
+          setTimeout(() => {
+            try {
+              if (sneakBot && sneakBot.entity) sneakBot.setControlState('sneak', false);
+            } catch (e) {}
+          }, 1000);
+          console.log('🚶 AFK Harakat: Sneak (Sneak)');
+          break;
+        }
           
-        case 'lookAround':
-          const yaw = Math.random() * Math.PI - (0.5 * Math.PI);
-          const pitch = Math.random() * Math.PI - (0.5 * Math.PI);
+        case 'lookAround': {
+          const yaw = Math.random() * Math.PI * 2;  // FIXED: full 360° range (0 to 2π)
+          const pitch = (Math.random() * Math.PI) - (Math.PI / 2);  // correct: -π/2 to π/2
           bot.look(yaw, pitch);
           console.log('👁️ AFK Harakat: Atrofga qarash (LookAround)');
           break;
+        }
           
         case 'attackMobs':
           attackNearbyMobs();
@@ -301,6 +427,19 @@ process.on('unhandledRejection', (reason, promise) => {
   console.error(`🔥 Unhandled Rejection: ${reason}`);
   triggerReconnect(`UnhandledRejection: ${reason}`);
 });
+
+process.on('SIGTERM', () => {
+  console.log('🛑 SIGTERM qabul qilindi, tozalanmoqda...');
+  cleanup();
+  setTimeout(() => process.exit(0), 1000);
+});
+
+process.on('SIGINT', () => {
+  console.log('🛑 SIGINT qabul qilindi, tozalanmoqda...');
+  cleanup();
+  setTimeout(() => process.exit(0), 1000);
+});
+// FIXED: graceful shutdown cleans player state file before process exits
 
 // Botni ishga tushirish
 startBot();

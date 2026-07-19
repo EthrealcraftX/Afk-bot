@@ -457,3 +457,402 @@
   padding: 10px;
   text-align: center;
 }
+
+/* ── Edit Server Modal ─────────────────────────────────────────────────── */
+@keyframes modalScaleIn {
+  from { opacity: 0; transform: scale(0.92) translateY(-12px); }
+  to   { opacity: 1; transform: scale(1)   translateY(0); }
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 20px;
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 480px;
+  background: linear-gradient(145deg, rgba(18, 18, 28, 0.98) 0%, rgba(10, 10, 18, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 25px 60px rgba(0, 0, 0, 0.6),
+    0 0 40px rgba(0, 255, 136, 0.04);
+  animation: modalScaleIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.modal-header h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.modal-header h2 i {
+  color: var(--accent-green, #00ff88);
+  font-size: 1rem;
+}
+
+.modal-close-btn {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+  font-size: 1rem;
+  transition: background 0.15s, color 0.15s;
+}
+
+.modal-close-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.modal-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-body .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.modal-body .form-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary, #8b8fa8);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.modal-error-msg {
+  font-size: 0.82rem;
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--radius-sm, 6px);
+  padding: 8px 12px;
+  min-height: 0;
+  margin: 0;
+}
+
+.modal-error-msg:empty {
+  display: none;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 16px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.modal-footer .btn {
+  min-width: 110px;
+}
+
+@media (max-width: 520px) {
+  .modal-footer {
+    flex-direction: column-reverse;
+  }
+  .modal-footer .btn {
+    width: 100%;
+  }
+}
+
+/* ── Bot Error Notification Panel ─────────────────────────────────────────── */
+
+/* Unread badge on the toggle button */
+.notif-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--accent-red, #ef4444);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border: 2px solid var(--bg-primary, #0a0a12);
+  animation: badgePulse 2s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes badgePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
+  50%       { box-shadow: 0 0 0 5px rgba(239,68,68,0); }
+}
+
+/* Slide-in panel (mirrors .events-popup layout) */
+.notif-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 400px;
+  max-width: 100vw;
+  height: 100vh;
+  background: rgba(10, 10, 15, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-left: 1px solid var(--border-color);
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.6);
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transition-normal, 0.25s ease), opacity var(--transition-normal, 0.25s ease);
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.notif-panel.hidden {
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Panel header */
+.notif-panel-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.01);
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.notif-panel-header > span {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notif-panel-header > span i {
+  color: var(--accent-amber, #f59e0b);
+}
+
+/* Scrollable list */
+.notif-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Empty state */
+.notif-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.notif-empty i {
+  font-size: 2.5rem;
+  color: var(--accent-green, #00ff88);
+  opacity: 0.6;
+}
+
+.notif-empty p {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Individual notification card */
+.notif-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-md, 10px);
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  position: relative;
+}
+
+.notif-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+/* Unread = brighter left border accent */
+.notif-item:not(.notif-item--read) {
+  border-left-width: 3px;
+}
+
+.notif-item--read {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.notif-item--read:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Severity left-border colours */
+.notif-item.notif-sev-error:not(.notif-item--read) {
+  border-left-color: var(--accent-red, #ef4444);
+}
+.notif-item.notif-sev-warning:not(.notif-item--read) {
+  border-left-color: var(--accent-amber, #f59e0b);
+}
+.notif-item.notif-sev-info:not(.notif-item--read) {
+  border-left-color: #3b82f6;
+}
+
+/* Card header row */
+.notif-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.notif-item-icon {
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.notif-item-title {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #fff;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notif-item-time {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Dismiss (×) button inside the card */
+.notif-dismiss-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: var(--radius-sm, 4px);
+  font-size: 0.75rem;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: background 0.12s, color 0.12s;
+}
+
+.notif-dismiss-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
+
+/* Project ID chip */
+.notif-project-id {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--accent-green, #00ff88);
+  background: rgba(0, 255, 136, 0.06);
+  border: 1px solid rgba(0, 255, 136, 0.12);
+  border-radius: var(--radius-sm, 4px);
+  padding: 1px 6px;
+  margin-bottom: 5px;
+}
+
+/* Main message text */
+.notif-item-msg {
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  margin: 0 0 5px;
+  line-height: 1.5;
+}
+
+/* Suggestion tip */
+.notif-item-suggestion {
+  font-size: 0.78rem;
+  color: var(--accent-amber, #f59e0b);
+  background: rgba(245, 158, 11, 0.06);
+  border: 1px solid rgba(245, 158, 11, 0.12);
+  border-radius: var(--radius-sm, 4px);
+  padding: 5px 10px;
+  margin: 4px 0 0;
+  line-height: 1.5;
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.notif-item-suggestion i {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+/* Scrollbar theming inside notif-list */
+.notif-list::-webkit-scrollbar {
+  width: 4px;
+}
+.notif-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.notif-list::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+}

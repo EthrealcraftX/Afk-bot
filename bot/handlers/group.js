@@ -47,6 +47,9 @@ async function handleMyChatMember(update) {
   }
 }
 
+const { handleObserver } = require('../status/groupObserver');
+const { handleIntent } = require('../status/groupIntent');
+
 /**
  * Called for every non-command message in a group/supergroup/channel.
  * Detects server-related keywords and replies with latest server info.
@@ -54,8 +57,14 @@ async function handleMyChatMember(update) {
  */
 async function handleGroupMessage(msg) {
   const { bot } = context;
-  const text    = (msg.text || '').trim();
+  
+  // 1. New observer logic (auto-detect IPs/domains)
+  await handleObserver(msg, bot);
+  
+  // 2. New intent logic (recommendations)
+  await handleIntent(msg, bot);
 
+  const text    = (msg.text || '').trim();
   if (!SERVER_KEYWORD_RE.test(text)) return;
 
   const srv = getLastServer();
@@ -66,13 +75,6 @@ async function handleGroupMessage(msg) {
 
   // Build inline keyboard
   const kbRows = [];
-
-  // Web panel button (standard URL, since web_app buttons cannot be opened in groups)
-/*   const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://afk.hypepath.uz';
-  kbRows.push([{
-    text: '🎮 Panelni ochish',
-    url: `${API_URL}/create`
-  }]); */
 
   // Aternos auto-join button (Bedrock only)
   if (atErnosUrl) {

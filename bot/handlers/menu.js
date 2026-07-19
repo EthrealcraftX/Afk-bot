@@ -1,7 +1,7 @@
 const context = require('../context');
 const { ensureTelegramAuth } = require('../auth');
 const { trackUser } = require('../store');
-const { ADMIN_USERNAME } = require('../config');
+const { ADMIN_USERNAME, DEFAULT_MAX_PROJECTS } = require('../config');
 const { kbMain, kbBack } = require('../keyboards');
 const { esc } = require('../formatters');
 const { editOrSend } = require('../ui');
@@ -74,7 +74,7 @@ async function handleHelp(chatId, sess, msgId) {
     `*Imkoniyatlar:*\n` +
     `🤖 Botga start bosing — avtomatik ro'yxatdan o'tiladi\n` +
     `📋 Barcha Minecraft AFK bot serverlaringizni ko'rish\n` +
-    `➕ Yangi server bot yaratish \\(maksimal ${esc(process.env.MAX_PROJECTS_PER_USER || 3)} ta\\)\n` +
+    `➕ Yangi server bot yaratish \\(maksimal ${esc(DEFAULT_MAX_PROJECTS)} ta\\)\n` +
     `▶️ Ishga tushirish  ⏹ To'xtatish — bir bosish bilan\n` +
     `📄 Bot jarayonidan loglarni ko'rish\n` +
     `📋 Hayot sikli hodisalarini ko'rish\n` +

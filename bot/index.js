@@ -30,9 +30,28 @@ loadVersions('bedrock');
 initCommands();
 initRouter();
 
+// 4. Start Background Jobs
+const { BackgroundJobs } = require('./jobs/healthCheck');
+BackgroundJobs.startHealthChecker();
+
 // 4. Handle polling errors
 bot.on('polling_error', (err) => {
-  console.error('Polling error:', err.code, err.message);
+  const code = err.code || '';
+  const message = err.message || '';
+
+  // 409 Conflict means another bot instance is already polling Telegram.
+  // Continuing is pointless — every subsequent getUpdates call will also fail.
+  // Exit immediately so the operator (or PM2 / systemd) knows what happened.
+  if (code === 'ETELEGRAM' && message.includes('409')) {
+    console.error(
+      '❌ [Bot] FATAL: 409 Conflict — another instance of this bot is already running.\n' +
+      '   Stop the other instance and restart this one.\n' +
+      '   Tip: run  Get-WmiObject Win32_Process | Where-Object Name -eq node.exe  to find it.'
+    );
+    process.exit(1);
+  }
+
+  console.error('Polling error:', code, message);
 });
 
 module.exports = bot;

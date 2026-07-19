@@ -1,5 +1,6 @@
 const context = require('../context');
 const store = require('../store');
+const { saveTickets } = require('../store');
 const { requireLogin } = require('../auth');
 const { kbCancel, kbMain } = require('../keyboards');
 const { esc } = require('../formatters');
@@ -43,6 +44,7 @@ async function wizardSupportMsg(chatId, sess, text) {
     replyAt:   null
   };
   store.supportTickets.push(ticket);
+  saveTickets(); // persist to disk immediately
 
   const confirmText =
     `✅ *Yordam so'rovi yaratildi\\!*\n\n` +

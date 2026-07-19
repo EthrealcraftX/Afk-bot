@@ -101,14 +101,38 @@ async function ensureTelegramAuth(chatId, sess) {
   }
 
   // ── EXISTING USER: auto-login ────────────────────────────────────────────
-  const loginResult = await api('POST', '/auth/login', {
+  let loginResult = await api('POST', '/auth/login', {
     username: stored.username,
     password: stored.password
   });
 
   if (!loginResult.success) {
     console.error(`[TG-AUTH] Auto-login failed for ${stored.username}:`, loginResult.error);
-    return false;
+
+    // ── RECOVERY: User may exist in tg_users.json but not in MongoDB ────────
+    // (e.g. after DB reset, server migration). Re-register with the stored
+    // password using the trusted bot token so the backend allows overwrite.
+    console.log(`[TG-AUTH] Attempting re-registration for ${stored.username}...`);
+    const signupResult = await api('POST', '/auth/signup', {
+      username: stored.username,
+      password: stored.password
+    });
+
+    if (!signupResult.success) {
+      console.error(`[TG-AUTH] Re-registration also failed for ${stored.username}:`, signupResult.error);
+      return false;
+    }
+
+    console.log(`[TG-AUTH] Re-registration success for ${stored.username}. Retrying login...`);
+    loginResult = await api('POST', '/auth/login', {
+      username: stored.username,
+      password: stored.password
+    });
+
+    if (!loginResult.success) {
+      console.error(`[TG-AUTH] Login after re-registration failed for ${stored.username}:`, loginResult.error);
+      return false;
+    }
   }
 
   sess.token    = loginResult.token;

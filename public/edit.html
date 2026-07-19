@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MC-AFK Bot Panel — Edit Server</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="create.css">
+    <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Telegram Mini App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        .readonly-badge {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .readonly-badge i {
+            font-size: 20px;
+            color: var(--primary-light, #60a5fa);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Premium Glassmorphic Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <i class="fa-solid fa-terminal"></i>
+                    <span>MC-AFK Bot Panel</span>
+                </a>
+                <button class="btn btn-ghost" onclick="window.location.href='/'">
+                    <i class="fa-solid fa-arrow-left"></i> Dashboardga qaytish
+                </button>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <div class="create-container">
+                <h1>Edit Server</h1>
+                <p class="create-subtitle">Server sozlamalarini tahrirlash</p>
+                
+                <form id="serverForm">
+                    <!-- Form notifications will be injected here -->
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ip">Server IP Address</label>
+                            <input type="text" id="ip" class="form-input" placeholder="e.g. servernoomi.aternos.me" required autocomplete="off">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="port">Server Port</label>
+                            <input type="number" id="port" class="form-input" placeholder="e.g. 25565" min="1" max="65535" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Server Edition (Read-Only) -->
+                    <div class="form-group">
+                        <label>Server Edition</label>
+                        <div id="editionBadge" class="readonly-badge">
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+                            <span>Loading Edition...</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Java Version Dropdown Selection -->
+                    <div class="form-group version-selector" id="javaVersions">
+                        <label for="javaVersion">Java Edition Version</label>
+                        <select id="javaVersion" class="form-input">
+                            <option value="">-- Java Version tanlang --</option>
+                            <option value="1.8">1.8</option>
+                            <option value="1.8">1.8.1</option>
+                            <option value="1.8">1.8.2</option>
+                            <option value="1.8">1.8.3</option>
+                            <option value="1.8">1.8.4</option>
+                            <option value="1.8">1.8.5</option>
+                            <option value="1.8">1.8.6</option>
+                            <option value="1.8">1.8.7</option>
+                            <option value="1.8">1.8.8</option>
+                            <option value="1.8">1.8.9</option>
+                            <option value="1.9">1.9</option>
+                            <option value="1.9">1.9.1</option>
+                            <option value="1.9">1.9.2</option>
+                            <option value="1.9">1.9.3</option>
+                            <option value="1.9">1.9.4</option>
+                            <option value="1.10">1.10</option>
+                            <option value="1.10">1.10.1</option>
+                            <option value="1.10">1.10.2</option>
+                            <option value="1.11">1.11</option>
+                            <option value="1.11">1.11.1</option>
+                            <option value="1.11">1.11.2</option>
+                            <option value="1.12">1.12</option>
+                            <option value="1.12">1.12.1</option>
+                            <option value="1.12">1.12.2</option>
+                            <option value="1.13">1.13</option>
+                            <option value="1.13">1.13.1</option>
+                            <option value="1.13">1.13.2</option>
+                            <option value="1.14">1.14</option>
+                            <option value="1.14">1.14.1</option>
+                            <option value="1.14">1.14.2</option>
+                            <option value="1.14">1.14.3</option>
+                            <option value="1.14">1.14.4</option>
+                            <option value="1.15">1.15</option>
+                            <option value="1.15">1.15.1</option>
+                            <option value="1.15">1.15.2</option>
+                            <option value="1.16">1.16</option>
+                            <option value="1.16">1.16.1</option>
+                            <option value="1.16">1.16.2</option>
+                            <option value="1.16">1.16.3</option>
+                            <option value="1.16">1.16.4</option>
+                            <option value="1.16">1.16.5</option>
+                            <option value="1.17">1.17</option>
+                            <option value="1.17">1.17.1</option>
+                            <option value="1.18">1.18</option>
+                            <option value="1.18">1.18.1</option>
+                            <option value="1.18">1.18.2</option>
+                            <option value="1.19">1.19</option>
+                            <option value="1.19">1.19.1</option>
+                            <option value="1.19.2">1.19.2</option>
+                            <option value="1.19.3">1.19.3</option>
+                            <option value="1.19.4">1.19.4</option>
+                            <option value="1.20">1.20</option>
+                            <option value="1.20.1">1.20.1</option>
+                            <option value="1.20.2">1.20.2</option>
+                            <option value="1.20.3">1.20.3</option>
+                            <option value="1.20.4">1.20.4</option>
+                            <option value="1.20.5">1.20.5</option>
+                            <option value="1.20.6">1.20.6</option>
+                            <option value="1.21">1.21</option>
+                            <option value="1.21.1">1.21.1</option>
+                            <option value="1.21.2">1.21.2</option>
+                            <option value="1.21.3">1.21.3</option>
+                            <option value="1.21.4">1.21.4</option>
+                            <option value="1.21.5">1.21.5</option>
+                            <option value="1.21.6">1.21.6</option>
+                            <option value="1.21.7">1.21.7</option>
+                            <option value="1.21.8">1.21.8</option>
+                            <option value="1.21.9">1.21.9</option>
+                            <option value="1.21.10">1.21.10</option>
+                            <option value="1.21.11">1.21.11</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Bedrock Version Dropdown Selection -->
+                    <div class="form-group version-selector" id="bedrockVersions">
+                        <label for="bedrockVersion">Bedrock Edition Version</label>
+                        <select id="bedrockVersion" class="form-input" disabled>
+                            <option value="">-- Bedrock Version tanlang --</option>
+                            <option value="1.16.201">1.8.1</option>
+                            <option value="1.16.201">1.9.0</option>
+                            <option value="1.16.201">1.10.0</option>
+                            <option value="1.16.201">1.11.0</option>
+                            <option value="1.16.201">1.11.1</option>
+                            <option value="1.16.201">1.11.2</option>
+                            <option value="1.16.201">1.11.4</option>
+                            <option value="1.16.201">1.12.0</option>
+                            <option value="1.16.201">1.12.1</option>
+                            <option value="1.16.201">1.13.0</option>
+                            <option value="1.16.201">1.13.1</option>
+                            <option value="1.16.201">1.13.2</option>
+                            <option value="1.16.201">1.13.3</option>
+                            <option value="1.16.201">1.14.0</option>
+                            <option value="1.16.201">1.14.1</option>
+                            <option value="1.16.201">1.14.20</option>
+                            <option value="1.16.201">1.14.21</option>
+                            <option value="1.16.201">1.14.30</option>
+                            <option value="1.16.201">1.14.32</option>
+                            <option value="1.16.201">1.14.60</option>
+                            <option value="1.16.201">1.16.0</option>
+                            <option value="1.16.201">1.16.1</option>
+                            <option value="1.16.201">1.16.10</option>
+                            <option value="1.16.201">1.16.20</option>
+                            <option value="1.16.201">1.16.40</option>
+                            <option value="1.16.201">1.16.100</option>
+                            <option value="1.16.201">1.16.101</option>
+                            <option value="1.16.201">1.16.200</option>
+                            <option value="1.16.201">1.16.201</option>
+                            <option value="1.16.210">1.16.210</option>
+                            <option value="1.16.220">1.16.220</option>
+                            <option value="1.16.220">1.16.221</option>
+                            <option value="1.17.0">1.17.0</option>
+                            <option value="1.17.0">1.17.1</option>
+                            <option value="1.17.0">1.17.2</option>
+                            <option value="1.17.10">1.17.10</option>
+                            <option value="1.17.10">1.17.11</option>
+                            <option value="1.17.30">1.17.30</option>
+                            <option value="1.17.30">1.17.31</option>
+                            <option value="1.17.30">1.17.32</option>
+                            <option value="1.17.30">1.17.33</option>
+                            <option value="1.17.40">1.17.34</option>
+                            <option value="1.17.40">1.17.40</option>
+                            <option value="1.17.40">1.17.41</option>
+                            <option value="1.18.0">1.18.0</option>
+                            <option value="1.18.0">1.18.1</option>
+                            <option value="1.18.0">1.18.2</option>
+                            <option value="1.18.11">1.18.10</option>
+                            <option value="1.18.11">1.18.11</option>
+                            <option value="1.18.11">1.18.12</option>
+                            <option value="1.18.30">1.18.30</option>
+                            <option value="1.18.30">1.18.31</option>
+                            <option value="1.18.30">1.18.32</option>
+                            <option value="1.18.30">1.18.33</option>
+                            <option value="1.19.1">1.19.0</option>
+                            <option value="1.19.1">1.19.1</option>
+                            <option value="1.19.1">1.19.2</option>
+                            <option value="1.19.10">1.19.10</option>
+                            <option value="1.19.10">1.19.11</option>
+                            <option value="1.19.20">1.19.20</option>
+                            <option value="1.19.21">1.19.21</option>
+                            <option value="1.19.21">1.19.22</option>
+                            <option value="1.19.30">1.19.30</option>
+                            <option value="1.19.30">1.19.31</option>
+                            <option value="1.19.40">1.19.40</option>
+                            <option value="1.19.41">1.19.41</option>
+                            <option value="1.19.50">1.19.50</option>
+                            <option value="1.19.50">1.19.51</option>
+                            <option value="1.19.50">1.19.52</option>
+                            <option value="1.19.60">1.19.60</option>
+                            <option value="1.19.60">1.19.61</option>
+                            <option value="1.19.62">1.19.62</option>
+                            <option value="1.19.63">1.19.63</option>
+                            <option value="1.19.70">1.19.70</option>
+                            <option value="1.19.70">1.19.71</option>
+                            <option value="1.19.70">1.19.72</option>
+                            <option value="1.19.70">1.19.73</option>
+                            <option value="1.19.80">1.19.80</option>
+                            <option value="1.19.80">1.19.81</option>
+                            <option value="1.19.80">1.19.83</option>
+                            <option value="1.20.0">1.20.0</option>
+                            <option value="1.20.0">1.20.1</option>
+                            <option value="1.20.10">1.20.10</option>
+                            <option value="1.20.10">1.20.11</option>
+                            <option value="1.20.10">1.20.12</option>
+                            <option value="1.20.10">1.20.13</option>
+                            <option value="1.20.10">1.20.14</option>
+                            <option value="1.20.10">1.20.15</option>
+                            <option value="1.20.30">1.20.30</option>
+                            <option value="1.20.30">1.20.31</option>
+                            <option value="1.20.30">1.20.32</option>
+                            <option value="1.20.40">1.20.40</option>
+                            <option value="1.20.40">1.20.41</option>
+                            <option value="1.20.50">1.20.50</option>
+                            <option value="1.20.50">1.20.51</option>
+                            <option value="1.20.61">1.20.60</option>
+                            <option value="1.20.61">1.20.61</option>
+                            <option value="1.20.61">1.20.62</option>
+                            <option value="1.20.71">1.20.70</option>
+                            <option value="1.20.71">1.20.71</option>
+                            <option value="1.20.71">1.20.72</option>
+                            <option value="1.20.71">1.20.73</option>
+                            <option value="1.20.80">1.20.80</option>
+                            <option value="1.20.80">1.20.81</option>
+                            <option value="1.21.0">1.21.0</option>
+                            <option value="1.21.0">1.21.1</option>
+                            <option value="1.21.2">1.21.2</option>
+                            <option value="1.21.2">1.21.3</option>
+                            <option value="1.21.21">1.21.20</option>
+                            <option value="1.21.21">1.21.21</option>
+                            <option value="1.21.21">1.21.22</option>
+                            <option value="1.21.21">1.21.23</option>
+                            <option value="1.21.30">1.21.30</option>
+                            <option value="1.21.30">1.21.31</option>
+                            <option value="1.21.42">1.21.40</option>
+                            <option value="1.21.42">1.21.41</option>
+                            <option value="1.21.42">1.21.42</option>
+                            <option value="1.21.42">1.21.43</option>
+                            <option value="1.21.42">1.21.44</option>
+                            <option value="1.21.50">1.21.50</option>
+                            <option value="1.21.50">1.21.51</option>
+                            <option value="1.21.60">1.21.60</option>
+                            <option value="1.21.60">1.21.61</option>
+                            <option value="1.21.60">1.21.62</option>
+                            <option value="1.21.70">1.21.70</option>
+                            <option value="1.21.70">1.21.71</option>
+                            <option value="1.21.70">1.21.72</option>
+                            <option value="1.21.70">1.21.73</option>
+                            <option value="1.21.80">1.21.80</option>
+                            <option value="1.21.80">1.21.81</option>
+                            <option value="1.21.80">1.21.82</option>
+                            <option value="1.21.80">1.21.83</option>
+                            <option value="1.21.80">1.21.84</option>
+                            <option value="1.21.90">1.21.90</option>
+                            <option value="1.21.90">1.21.91</option>
+                            <option value="1.21.90">1.21.92</option>
+                            <option value="1.21.93">1.21.93</option>
+                            <option value="1.21.93">1.21.94</option>
+                            <option value="1.21.93">1.21.95</option>
+                            <option value="1.21.100">1.21.100</option>
+                            <option value="1.21.100">1.21.101</option>
+                            <option value="1.21.100">1.21.102</option>
+                            <option value="1.21.111">1.21.111</option>
+                            <option value="1.21.111">1.21.112</option>
+                            <option value="1.21.111">1.21.113</option>
+                            <option value="1.21.111">1.21.114</option>
+                            <option value="1.21.120">1.21.120</option>
+                            <option value="1.21.120">1.21.121</option>
+                            <option value="1.21.120">1.21.122</option>
+                            <option value="1.21.120">1.21.123</option>
+                            <option value="1.21.124">1.21.124</option>
+                            <option value="1.21.130">1.21.130</option>
+                            <option value="1.21.130">1.21.131</option>
+                            <option value="1.21.130">1.21.132</option>
+                            <option value="1.26.0">26.0</option>
+                            <option value="1.26.0">26.1</option>
+                            <option value="1.26.0">26.2</option>
+                            <option value="1.26.0">26.3</option>
+                            <option value="1.26.10">26.10</option>
+                            <option value="1.26.10">26.11</option>
+                            <option value="1.26.10">26.12</option>
+                            <option value="1.26.10">26.13</option>
+                            <option value="1.26.10">26.14</option>
+                            <option value="1.26.20">26.20</option>
+                            <option value="1.26.20">26.21</option>
+                        </select>
+                    </div>
+                    
+                    <div class="submit-btn-wrapper">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            O'zgarishlarni saqlash
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <footer class="app-footer">
+            <p>MC-AFK Bot Panel &copy; 2026. Made with Vanilla Tech.</p>
+        </footer>
+    </div>
+
+    <script>
+        let projectId = '';
+        let serverType = '';
+
+        // DOM elements
+        const serverForm = document.getElementById('serverForm');
+        const portInput = document.getElementById('port');
+        const javaVersions = document.getElementById('javaVersions');
+        const bedrockVersions = document.getElementById('bedrockVersions');
+        const javaVersionSelect = document.getElementById('javaVersion');
+        const bedrockVersionSelect = document.getElementById('bedrockVersion');
+        const submitBtn = document.getElementById('submitBtn');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlToken = urlParams.get('token');
+            const urlProject = urlParams.get('project') || urlParams.get('id');
+
+            // Determine token and project ID
+            if (urlToken) {
+                if (urlToken.startsWith('project_') || /^project_\d+(_[a-z0-9]+)?$/.test(urlToken)) {
+                    projectId = urlToken;
+                } else {
+                    localStorage.setItem('token', urlToken);
+                }
+            }
+            if (urlProject) {
+                projectId = urlProject;
+            }
+
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/auth/login.html';
+                return;
+            }
+
+            if (!projectId) {
+                showErrorMessage('Project ID is required.');
+                return;
+            }
+
+            // Verify authentication session and load project data
+            try {
+                const response = await fetch(`/api/projects/${projectId}/status`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        localStorage.removeItem('token');
+                        window.location.href = '/auth/login.html';
+                        return;
+                    }
+                    const errRes = await response.json();
+                    throw new Error(errRes.error || 'Failed to fetch server info');
+                }
+                const result = await response.json();
+                if (result.success && result.details) {
+                    populateForm(result.details);
+                } else {
+                    throw new Error('Server not found');
+                }
+            } catch (e) {
+                showErrorMessage(e.message);
+            }
+        });
+
+        function populateForm(details) {
+            document.getElementById('ip').value = details.host || '';
+            document.getElementById('port').value = details.port || '';
+            serverType = details.type;
+
+            const editionBadge = document.getElementById('editionBadge');
+            if (details.type === 'java') {
+                editionBadge.innerHTML = `<i class="fa-solid fa-mug-hot"></i> <span>Java Edition</span>`;
+                selectType('java');
+                javaVersionSelect.value = details.version;
+            } else {
+                editionBadge.innerHTML = `<i class="fa-solid fa-cube"></i> <span>Bedrock Edition</span>`;
+                selectType('bedrock');
+                bedrockVersionSelect.value = details.version;
+            }
+        }
+
+        window.selectType = function(type) {
+            javaVersions.classList.remove('active');
+            bedrockVersions.classList.remove('active');
+            
+            javaVersionSelect.required = false;
+            bedrockVersionSelect.required = false;
+            javaVersionSelect.disabled = true;
+            bedrockVersionSelect.disabled = true;
+
+            if (type === 'java') {
+                javaVersions.classList.add('active');
+                javaVersionSelect.required = true;
+                javaVersionSelect.disabled = false;
+            } else {
+                bedrockVersions.classList.add('active');
+                bedrockVersionSelect.required = true;
+                bedrockVersionSelect.disabled = false;
+            }
+        };
+
+        function cleanIPAddress(ip) {
+            let cleanIp = ip.trim().toLowerCase();
+            
+            // If it contains add.aternos. or aternos.me/ or aternos.org/ or is a redirect link, keep it as is so the backend can resolve it
+            if (cleanIp.includes('add.aternos.') || cleanIp.includes('aternos.me/') || cleanIp.includes('aternos.org/')) {
+                return ip.trim();
+            }
+
+            // Strip protocols (http://, https://) and www. if entered
+            cleanIp = cleanIp.replace(/^(https?:\/\/)?(www\.)?/, '');
+            
+            return ip.trim();
+        }
+
+        // Live correction when user finishes typing and clicks away
+        const ipInput = document.getElementById('ip');
+        if (ipInput) {
+            ipInput.addEventListener('blur', () => {
+                ipInput.value = cleanIPAddress(ipInput.value);
+            });
+        }
+
+        // Submit form edit request
+        serverForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Saving Changes...';
+
+            const token = localStorage.getItem('token') || '';
+            const rawIp = document.getElementById('ip').value;
+            const cleanedIp = cleanIPAddress(rawIp);
+            document.getElementById('ip').value = cleanedIp; // update visually
+
+            const formData = {
+                ip: cleanedIp,
+                port: parseInt(portInput.value),
+                version: serverType === 'java'
+                    ? javaVersionSelect.value
+                    : bedrockVersionSelect.value
+            };
+
+            // Client side validation
+            if (!validateForm(formData)) {
+                resetSubmitButton();
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/projects/${projectId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || "Failed to update server settings");
+                }
+
+                if (result.success) {
+                    showSuccessMessage('Server settings successfully updated!');
+                    // If opened inside Telegram Mini App — close it
+                    const tg = window.Telegram?.WebApp;
+                    if (tg && tg.initData) {
+                        tg.ready();
+                        setTimeout(() => tg.close(), 1200);
+                    } else {
+                        setTimeout(() => window.location.href = '/', 1500);
+                    }
+                } else {
+                    throw new Error(result.error || "Unknown response received from server");
+                }
+            } catch (error) {
+                console.error('Server update error:', error);
+                showErrorMessage(error.message);
+                resetSubmitButton();
+            }
+        });
+
+        function validateForm(data) {
+            if (!data.ip || !data.port || !data.version) {
+                showErrorMessage("Please fill out all required parameters.");
+                return false;
+            }
+            if (isNaN(data.port) || data.port < 1 || data.port > 65535) {
+                showErrorMessage("Connection port must be between 1 and 65535.");
+                return false;
+            }
+            return true;
+        }
+
+        function showSuccessMessage(message) {
+            clearAlerts();
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert success';
+            alertDiv.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>${message}</span>`;
+            serverForm.prepend(alertDiv);
+        }
+
+        function showErrorMessage(message) {
+            clearAlerts();
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert error';
+            alertDiv.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> <span>${message}</span>`;
+            serverForm.prepend(alertDiv);
+        }
+
+        function clearAlerts() {
+            const alerts = serverForm.querySelectorAll('.alert');
+            alerts.forEach(a => a.remove());
+        }
+
+        function resetSubmitButton() {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "O'zgarishlarni saqlash";
+        }
+    </script>
+</body>
+</html>

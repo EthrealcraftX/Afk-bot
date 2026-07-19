@@ -1,5 +1,6 @@
 const context = require('../context');
 const api = require('../api');
+const { ensureTelegramAuth } = require('../auth');
 const { kbCancel, kbServerType, kbVersions, kbServer, kbBack } = require('../keyboards');
 const { esc } = require('../formatters');
 
@@ -15,7 +16,28 @@ const { esc } = require('../formatters');
  */
 const VERSION_ALIASES = {
   // ==================== BEDROCK ====================
- 
+  // 1.8.x - 1.14.x
+  '1.8.1':   '1.16.201',
+  '1.9.0':   '1.16.201',
+  '1.10.0':  '1.16.201',
+  '1.11.0':  '1.16.201',
+  '1.11.1':  '1.16.201',
+  '1.11.2':  '1.16.201',
+  '1.11.4':  '1.16.201',
+  '1.12.0':  '1.16.201',
+  '1.12.1':  '1.16.201',
+  '1.13.0':  '1.16.201',
+  '1.13.1':  '1.16.201',
+  '1.13.2':  '1.16.201',
+  '1.13.3':  '1.16.201',
+  '1.14.0':  '1.16.201',
+  '1.14.1':  '1.16.201',
+  '1.14.20': '1.16.201',
+  '1.14.21': '1.16.201',
+  '1.14.30': '1.16.201',
+  '1.14.32': '1.16.201',
+  '1.14.60': '1.16.201',
+
   // 1.16.x
   '1.16.0':   '1.16.201',
   '1.16.1':   '1.16.201',
@@ -211,7 +233,9 @@ const VERSION_ALIASES = {
 };
 
 async function startCreate(chatId, sess) {
-  if (!sess.token) {
+  // Always refresh/obtain a valid token before embedding it in the mini app URL
+  const ok = await ensureTelegramAuth(chatId, sess);
+  if (!ok) {
     await context.bot.sendMessage(chatId,
       `🔒 *Tizimga kirish talab etiladi*\n\n` +
       `Server yaratish uchun tizimga kirishingiz kerak\\.\n Qayta /start bosing yoki quyidagi tugma orqali botni qayta ishga tushiring:\n`,
@@ -228,16 +252,16 @@ async function startCreate(chatId, sess) {
     return;
   }
 
+  // sess.token is now fresh (just verified or re-issued)
+  const { WEB_APP_URL, IS_HTTPS } = require('../config');
+  const url = `${WEB_APP_URL}/create?token=${encodeURIComponent(sess.token)}`;
+  const button = IS_HTTPS
+    ? { text: "📱 Mini ilovada ochish", web_app: { url } }
+    : { text: "📱 Brauzerda ochish", url };
+
   const kb = {
     inline_keyboard: [
-      [
-        {
-          text: "📱 Mini ilovada ochish",
-          web_app: {
-            url: `https://afk.hypepath.uz/create?token=${encodeURIComponent(sess.token)}`
-          }
-        }
-      ],
+      [ button ],
       [
         {
           text: "🔙 Orqaga",
@@ -288,12 +312,47 @@ async function startCreateWizard(chatId, sess) {
 }
 
 async function wizardCreateIp(chatId, sess, text) {
-  if (!/^[a-zA-Z0-9.\-_]{1,253}$/.test(text)) {
+  const { isAternosAddLink, resolveAternosLink } = require('../../api/aternosResolver');
+  const isAternos = isAternosAddLink(text);
+
+  if (!isAternos && !/^[a-zA-Z0-9.\-_]{1,253}$/.test(text)) {
     return context.bot.sendMessage(chatId,
       `❌ *Noto'g'ri hostname*\n\nIltimos to'g'ri IP yoki domen kiriting \\(bo'sh joy bo'lmasin\\)\\.`,
       { parse_mode: 'MarkdownV2', reply_markup: kbCancel() }
     );
   }
+
+  if (isAternos) {
+    // Notify resolving
+    const loadingMsg = await context.bot.sendMessage(chatId, `🔍 *Aternos havolasi tahlil qilinmoqda\\.\\.\\.*`, { parse_mode: 'MarkdownV2' });
+
+    try {
+      const resolved = await resolveAternosLink(text);
+      if (resolved) {
+        sess.draft.ip = resolved.hostname;
+        sess.draft.port = resolved.port;
+        sess.state = 'create_type';
+
+        // Delete loading message
+        await context.bot.deleteMessage(chatId, loadingMsg.message_id).catch(() => {});
+
+        const typeLabelText = `✅ *Havola muvaffaqiyatli tahlil qilindi\\!*\n\n🌐 Host: \`${esc(resolved.hostname)}\`\n🔌 Port: \`${esc(String(resolved.port))}\`\n\n🎮 Server *turini* tanlang:`;
+        await context.bot.sendMessage(chatId, typeLabelText, {
+          parse_mode: 'MarkdownV2',
+          reply_markup: kbServerType()
+        });
+        return;
+      }
+    } catch (err) {
+      console.error('Telegram wizard Aternos resolution failed:', err);
+      await context.bot.deleteMessage(chatId, loadingMsg.message_id).catch(() => {});
+      return context.bot.sendMessage(chatId,
+        `❌ *Aternos havolasini tahlil qilib bo'lmadi*\n\n\`${esc(err.message || 'Noma\'lum xato')}\`\n\nIltimos boshqa havola kiriting yoki qo'lda hostnameni kiriting:`,
+        { parse_mode: 'MarkdownV2', reply_markup: kbCancel() }
+      );
+    }
+  }
+
   sess.draft.ip = text;
   sess.state = 'create_port';
 

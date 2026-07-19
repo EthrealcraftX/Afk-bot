@@ -1,6 +1,22 @@
 {
+  "8475331869": {
+    "username": "tg_8475331869",
+    "password": "4634e21087bae918"
+  },
   "5732326881": {
     "username": "tg_5732326881",
-    "password": "adf43900fdb62cf1"
+    "encryptedPassword": {
+      "iv": "fb90cb3ded5e4d40485235b9",
+      "ciphertext": "ffb824107be7c9bc1005435d37541d33",
+      "authTag": "b9565d8f94650b6ef41510176d704ed8"
+    }
+  },
+  "7168740229": {
+    "username": "tg_7168740229",
+    "encryptedPassword": {
+      "iv": "aef8ef0d02cecc066736de7a",
+      "ciphertext": "31dbdb8236c2dc76d740ad784ba449e7",
+      "authTag": "ea7bb51be60fca90eda1224fce911fad"
+    }
   }
 }

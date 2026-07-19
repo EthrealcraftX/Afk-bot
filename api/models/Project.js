@@ -58,6 +58,21 @@ const ProjectSchema = new mongoose.Schema({
   },
   stoppedAt: {
     type: Date
+  },
+  // The OS PID of the most recently spawned child process.
+  // Persisted so syncStatusOnBoot() can attempt to SIGTERM orphaned processes
+  // that survived a server restart. Set to null when the process is stopped cleanly.
+  lastPid: {
+    type: Number,
+    default: null
+  },
+  // Wall-clock timestamp recorded immediately after spawn() returned.
+  // Used by syncStatusOnBoot() to confirm that the PID in lastPid still belongs
+  // to our process and was not recycled by the OS. A recycled PID will always
+  // have a later OS start time than this recorded timestamp.
+  lastPidStartedAt: {
+    type: Date,
+    default: null
   }
 });
 

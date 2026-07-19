@@ -3,6 +3,7 @@ const { requireLogin } = require('../auth');
 const { kbServer, kbBack, kbDeleteConfirm } = require('../keyboards');
 const { esc, fmtShortId, fmtTime, fmtUptime } = require('../formatters');
 const { editOrSend, buildServerCard } = require('../ui');
+const { DEFAULT_MAX_PROJECTS } = require('../config');
 
 async function handleListServers(chatId, sess, msgId) {
   if (!sess.token) return requireLogin(chatId, sess, msgId);
@@ -296,7 +297,7 @@ async function handleStats(chatId, sess, msgId) {
   const projects = result.projects || {};
   const ids      = Object.keys(projects);
   const total    = ids.length;
-  const maxProj  = parseInt(process.env.MAX_PROJECTS_PER_USER) || 3;
+  const maxProj  = DEFAULT_MAX_PROJECTS;
   let running = 0, stopped = 0, java = 0, bedrock = 0;
 
   ids.forEach(id => {
@@ -366,6 +367,32 @@ async function handleServerPlayers(chatId, sess, msgId, projectId) {
   sess.lastMsgId = await editOrSend(chatId, msgId, text, kb);
 }
 
+async function handleEditServer(chatId, sess, msgId, projectId) {
+  if (!sess.token) return requireLogin(chatId, sess, msgId);
+
+  // Ensure token is fresh before embedding in mini app URL
+  const { ensureTelegramAuth } = require('../auth');
+  await ensureTelegramAuth(chatId, sess);
+
+  const result = await api('GET', `/projects/${projectId}/status`, null, sess.token);
+
+  if (!result.success) {
+    const text = `❌ *Server topilmadi*\n\n\`${esc(result.error)}\``;
+    return editOrSend(chatId, msgId, text, kbBack('servers'));
+  }
+
+  const d = result.details;
+  const botName = `${d.host}:${d.port}`;
+
+  const { kbEditMiniApp } = require('../keyboards');
+  const text =
+    `✏️ *Botni tahrirlash*\n` +
+    `Bot: \`${esc(botName)}\`\n\n` +
+    `Tahrirlash uchun quyidagi tugmani bosing 👇`;
+
+  sess.lastMsgId = await editOrSend(chatId, msgId, text, kbEditMiniApp(projectId, sess.token));
+}
+
 module.exports = {
   handleListServers,
   handleServerInfo,
@@ -376,5 +403,6 @@ module.exports = {
   handleServerEvents,
   handleAllEvents,
   handleStats,
-  handleServerPlayers
+  handleServerPlayers,
+  handleEditServer
 };

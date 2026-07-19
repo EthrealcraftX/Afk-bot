@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bedrock Dashboard Mockup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* FONTS */
+        @font-face {
+            font-family: 'MinecraftTen';
+            src: url('https://cdn.jsdelivr.net/gh/South-Paw/typeface-minecraft@master/fonts/MinecraftTen.woff2') format('woff2');
+        }
+
+        /* CSS RESET & VARIABLES */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            /* Colors */
+            --mc-header-bg: #D0D1D4;
+            --mc-header-text: #1E1E1E;
+            --mc-panel-bg: #2A2A2A;
+            --mc-card-bg: #1F1F1F;
+            --mc-console-bg: #141414;
+            --mc-footer-bg: #1A1A1A;
+            
+            --mc-border: #3A3A3A;
+            --mc-border-light: #BEBEBE;
+            
+            --mc-green: #3C8527;
+            --mc-green-hover: #4CAF50;
+            --mc-green-active: #2E6B1E;
+            
+            --mc-gray: #424242;
+            --mc-gray-hover: #5A5A5A;
+            --mc-gray-active: #2A2A2A;
+            
+            --mc-red: #D32F2F;
+            --mc-red-hover: #E53935;
+            --mc-red-active: #B71C1C;
+            
+            --mc-blue: #2196F3;
+            --mc-orange: #FFC107;
+            
+            --text-primary: #FFFFFF;
+            --text-secondary: #BDBDBD;
+            --text-muted: #757575;
+            
+            /* Fonts */
+            --font-title: 'MinecraftTen', monospace;
+            --font-body: 'Inter', sans-serif;
+            
+            /* Spacing (8px grid) */
+            --sp-1: 8px;
+            --sp-2: 16px;
+            --sp-3: 24px;
+            --sp-4: 32px;
+            --sp-6: 48px;
+            --sp-8: 64px;
+        }
+
+        body {
+            font-family: var(--font-body);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://raw.githubusercontent.com/South-Paw/typeface-minecraft/master/assets/background.jpg') center/cover fixed;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 1. HEADER */
+        .header {
+            background-color: var(--mc-header-bg);
+            border-bottom: 1px solid var(--mc-border-light);
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--sp-3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-logo {
+            font-family: var(--font-title);
+            font-size: 24px;
+            color: var(--mc-header-text);
+            text-transform: uppercase;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+        }
+
+        .header-btn {
+            background: #E0E0E0;
+            border-top: 2px solid #FFFFFF;
+            border-left: 2px solid #FFFFFF;
+            border-bottom: 2px solid #9E9E9E;
+            border-right: 2px solid #9E9E9E;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 var(--sp-2);
+            color: var(--mc-header-text);
+            font-family: var(--font-title);
+            font-size: 16px;
+            cursor: pointer;
+            gap: var(--sp-1);
+        }
+
+        .header-btn:active {
+            border-top: 2px solid #9E9E9E;
+            border-left: 2px solid #9E9E9E;
+            border-bottom: 2px solid #FFFFFF;
+            border-right: 2px solid #FFFFFF;
+            transform: translateY(1px);
+        }
+
+        .icon-btn {
+            width: 40px;
+            padding: 0;
+        }
+
+        /* MAIN CONTAINER */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+            padding: var(--sp-4) var(--sp-3);
+            display: flex;
+            flex-direction: column;
+            gap: var(--sp-4);
+        }
+
+        /* 2. MAIN PANEL */
+        .main-panel {
+            background-color: var(--mc-panel-bg);
+            border: 1px solid var(--mc-border);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            padding: var(--sp-3);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--sp-3);
+            flex-wrap: wrap;
+            gap: var(--sp-2);
+        }
+
+        .panel-title {
+            display: flex;
+            align-items: baseline;
+            gap: var(--sp-2);
+        }
+
+        .panel-title h1 {
+            font-family: var(--font-title);
+            font-size: 24px;
+            color: var(--text-primary);
+        }
+
+        .panel-title span {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .panel-controls {
+            display: flex;
+            align-items: center;
+            gap: var(--sp-2);
+        }
+
+        /* SEARCH BAR */
+        .search-bar {
+            background-color: var(--mc-card-bg);
+            border: 1px solid var(--mc-border);
+            height: 44px;
+            display: flex;
+            align-items: center;
+            padding: 0 var(--sp-2);
+            width: 250px;
+        }
+
+        .search-bar input {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+            margin-left: var(--sp-1);
+        }
+
+        .search-bar input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* VIEW TOGGLES */
+        .view-toggles {
+            display: flex;
+            gap: 4px;
+        }
+
+        .view-btn {
+            background-color: var(--mc-gray);
+            border: 1px solid var(--mc-border);
+            color: var(--text-secondary);
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+
+        .view-btn.active {
+            background-color: var(--mc-card-bg);
+            color: var(--text-primary);
+            border-color: var(--text-secondary);
+        }
+
+        /* BUTTONS */
+        .mc-btn {
+            height: 44px;
+            padding: 0 var(--sp-3);
+            border: 1px solid var(--mc-border);
+            font-family: var(--font-title);
+            font-size: 16px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--sp-1);
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+            text-transform: uppercase;
+        }
+
+        .mc-btn:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+
+        .btn-green { background-color: var(--mc-green); }
+        .btn-green:hover { background-color: var(--mc-green-hover); }
+        .btn-green:active { background-color: var(--mc-green-active); }
+
+        .btn-gray { background-color: var(--mc-gray); }
+        .btn-gray:hover { background-color: var(--mc-gray-hover); }
+        .btn-gray:active { background-color: var(--mc-gray-active); }
+
+        .btn-red { background-color: var(--mc-red); }
+        .btn-red:hover { background-color: var(--mc-red-hover); }
+        .btn-red:active { background-color: var(--mc-red-active); }
+
+        /* SERVER GRID */
+        .server-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--sp-3);
+        }
+
+        /* SERVER CARD */
+        .server-card {
+            background-color: var(--mc-card-bg);
+            border: 1px solid var(--mc-border);
+            padding: var(--sp-2);
+            display: flex;
+            flex-direction: column;
+            gap: var(--sp-2);
+            transition: background 0.1s;
+        }
+
+        .server-card:hover {
+            background-color: #242424;
+        }
+
+        .card-content {
+            display: flex;
+            gap: var(--sp-2);
+        }
+
+        .card-thumb {
+            width: 220px;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            border: 1px solid var(--mc-border);
+            flex-shrink: 0;
+            background-color: #000;
+        }
+
+        .card-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--sp-1);
+        }
+
+        .card-title {
+            font-family: var(--font-title);
+            font-size: 20px;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .menu-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .menu-btn:hover { color: var(--text-primary); }
+
+        .status-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: var(--sp-1);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+        }
+
+        .status-text {
+            font-family: var(--font-title);
+            font-size: 14px;
+        }
+
+        .color-running { color: var(--mc-green-hover); }
+        .bg-running { background-color: var(--mc-green-hover); }
+
+        .color-offline { color: var(--mc-red-hover); }
+        .bg-offline { background-color: var(--mc-red-hover); }
+
+        .color-starting { color: var(--mc-orange); }
+        .bg-starting { background-color: var(--mc-orange); }
+
+        .info-lines {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: auto;
+        }
+
+        .info-lines strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: var(--sp-1);
+            margin-top: var(--sp-1);
+        }
+
+        .card-actions .mc-btn {
+            flex: 1;
+            font-size: 14px;
+            height: 40px;
+        }
+
+        /* CONSOLE PANEL */
+        .console-panel {
+            background-color: var(--mc-panel-bg);
+            border: 1px solid var(--mc-border);
+            padding: var(--sp-3);
+            display: flex;
+            flex-direction: column;
+            gap: var(--sp-3);
+        }
+
+        .console-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .console-header h2 {
+            font-family: var(--font-title);
+            font-size: 20px;
+        }
+
+        .console-select {
+            background-color: var(--mc-card-bg);
+            border: 1px solid var(--mc-border);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            padding: 8px var(--sp-2);
+            font-size: 14px;
+            outline: none;
+            width: 250px;
+        }
+
+        .console-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--sp-3);
+        }
+
+        .console-box {
+            background-color: var(--mc-console-bg);
+            border: 1px solid var(--mc-border);
+            padding: var(--sp-2);
+            height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .console-box h3 {
+            font-family: var(--font-title);
+            font-size: 16px;
+            color: var(--text-primary);
+            margin-bottom: var(--sp-2);
+            border-bottom: 1px solid var(--mc-border);
+            padding-bottom: var(--sp-1);
+        }
+
+        .log-entry { margin-bottom: 4px; }
+        .log-time { color: var(--text-muted); margin-right: 8px; }
+        .log-info { color: var(--mc-blue); }
+        .log-warn { color: var(--mc-orange); }
+        .log-error { color: var(--mc-red-hover); }
+
+        /* FOOTER */
+        .footer {
+            background-color: var(--mc-footer-bg);
+            border-top: 1px solid var(--mc-border);
+            padding: var(--sp-2) var(--sp-3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .footer-stats {
+            display: flex;
+            gap: var(--sp-3);
+        }
+
+        .footer-stats span strong {
+            color: var(--text-primary);
+            margin-left: 4px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1200px) {
+            .server-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 900px) {
+            .console-split { grid-template-columns: 1fr; }
+            .card-content { flex-direction: column; }
+            .card-thumb { width: 100%; aspect-ratio: 21/9; }
+            .footer { flex-direction: column; gap: var(--sp-2); }
+        }
+
+        @media (max-width: 600px) {
+            .card-actions { flex-wrap: wrap; }
+            .card-actions .mc-btn { min-width: 45%; }
+            .header-logo { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP HEADER -->
+    <header class="header">
+        <div class="header-logo">DASHBOARD</div>
+        <div class="header-actions">
+            <button class="header-btn icon-btn"><i class="fa-solid fa-bell"></i></button>
+            <button class="header-btn">
+                <i class="fa-solid fa-user"></i>
+                ALEXMC
+            </button>
+            <button class="header-btn icon-btn"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
+        
+        <!-- MAIN PANEL -->
+        <section class="main-panel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <h1>MY SERVERS</h1>
+                    <span>4 servers</span>
+                </div>
+                <div class="panel-controls">
+                    <div class="search-bar">
+                        <i class="fa-solid fa-magnifying-glass" style="color:var(--text-muted)"></i>
+                        <input type="text" placeholder="Search servers...">
+                    </div>
+                    <div class="view-toggles">
+                        <button class="view-btn active"><i class="fa-solid fa-border-all"></i></button>
+                        <button class="view-btn"><i class="fa-solid fa-list"></i></button>
+                    </div>
+                    <button class="mc-btn btn-green">
+                        <i class="fa-solid fa-plus"></i> CREATE SERVER
+                    </button>
+                </div>
+            </div>
+
+            <!-- SERVER GRID -->
+            <div class="server-grid">
+                
+                <!-- CARD 1: RUNNING -->
+                <div class="server-card">
+                    <div class="card-content">
+                        <!-- Placeholder thumb, imagine a minecraft screenshot -->
+                        <div class="card-thumb" style="background: url('https://picsum.photos/400/225?random=1') center/cover;"></div>
+                        <div class="card-info">
+                            <div class="card-header-row">
+                                <h2 class="card-title">Survival SMP</h2>
+                                <button class="menu-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                            </div>
+                            <div class="status-row">
+                                <div class="status-dot bg-running"></div>
+                                <span class="status-text color-running">RUNNING</span>
+                            </div>
+                            <div class="info-lines">
+                                <div>Version: <strong>1.21.1</strong></div>
+                                <div>Players: <strong>12 / 100</strong></div>
+                                <div>Bots: <strong>3</strong></div>
+                                <div>Address: <strong>play.survival-smp.net</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="mc-btn btn-gray" style="opacity: 0.5; cursor: not-allowed;"><i class="fa-solid fa-play"></i> START</button>
+                        <button class="mc-btn btn-gray"><i class="fa-solid fa-square"></i> STOP</button>
+                        <button class="mc-btn btn-gray"><i class="fa-solid fa-pen"></i> EDIT</button>
+                        <button class="mc-btn btn-red"><i class="fa-solid fa-trash-can"></i> DELETE</button>
+                    </div>
+                </div>
+
+                <!-- CARD 2: OFFLINE -->
+                <div class="server-card">
+                    <div class="card-content">
+                        <div class="card-thumb" style="background: url('https://picsum.photos/400/225?random=2') center/cover;"></div>
+                        <div class="card-info">
+                            <div class="card-header-row">
+                                <h2 class="card-title">Bedwars Hub</h2>
+                                <button class="menu-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                            </div>
+                            <div class="status-row">
+                                <div class="status-dot bg-offline"></div>
+                                <span class="status-text color-offline">OFFLINE</span>
+                            </div>
+                            <div class="info-lines">
+                                <div>Version: <strong>1.8.9</strong></div>
+                                <div>Players: <strong>0 / 500</strong></div>
+                                <div>Bots: <strong>0</strong></div>
+                                <div>Address: <strong>mc.bedwars-hub.com</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="mc-btn btn-green"><i class="fa-solid fa-play"></i> START</button>
+                        <button class="mc-btn btn-gray" style="opacity: 0.5; cursor: not-allowed;"><i class="fa-solid fa-square"></i> STOP</button>
+                        <button class="mc-btn btn-gray"><i class="fa-solid fa-pen"></i> EDIT</button>
+                        <button class="mc-btn btn-red"><i class="fa-solid fa-trash-can"></i> DELETE</button>
+                    </div>
+                </div>
+
+                <!-- CARD 3: STARTING -->
+                <div class="server-card">
+                    <div class="card-content">
+                        <div class="card-thumb" style="background: url('https://picsum.photos/400/225?random=3') center/cover;"></div>
+                        <div class="card-info">
+                            <div class="card-header-row">
+                                <h2 class="card-title">Creative Plots</h2>
+                                <button class="menu-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                            </div>
+                            <div class="status-row">
+                                <div class="status-dot bg-starting"></div>
+                                <span class="status-text color-starting">STARTING</span>
+                            </div>
+                            <div class="info-lines">
+                                <div>Version: <strong>1.20.4</strong></div>
+                                <div>Players: <strong>0 / 50</strong></div>
+                                <div>Bots: <strong>1</strong></div>
+                                <div>Address: <strong>creative.server.net</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="mc-btn btn-gray" style="opacity: 0.5; cursor: not-allowed;"><i class="fa-solid fa-play"></i> START</button>
+                        <button class="mc-btn btn-gray"><i class="fa-solid fa-square"></i> STOP</button>
+                        <button class="mc-btn btn-gray" style="opacity: 0.5; cursor: not-allowed;"><i class="fa-solid fa-pen"></i> EDIT</button>
+                        <button class="mc-btn btn-red" style="opacity: 0.5; cursor: not-allowed;"><i class="fa-solid fa-trash-can"></i> DELETE</button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- CONSOLE PANEL -->
+        <section class="console-panel">
+            <div class="console-header">
+                <h2>CONSOLE & EVENTS</h2>
+                <select class="console-select">
+                    <option>Survival SMP</option>
+                    <option>Bedwars Hub</option>
+                    <option>Creative Plots</option>
+                </select>
+            </div>
+            
+            <div class="console-split">
+                <div class="console-box">
+                    <h3>TERMINAL LOGS</h3>
+                    <div class="log-entry"><span class="log-time">[14:22:01]</span> <span class="log-info">[INFO]</span> Starting minecraft server version 1.21.1</div>
+                    <div class="log-entry"><span class="log-time">[14:22:03]</span> <span class="log-info">[INFO]</span> Loading properties</div>
+                    <div class="log-entry"><span class="log-time">[14:22:03]</span> <span class="log-info">[INFO]</span> Default game type: SURVIVAL</div>
+                    <div class="log-entry"><span class="log-time">[14:22:04]</span> <span class="log-info">[INFO]</span> Generating keypair</div>
+                    <div class="log-entry"><span class="log-time">[14:22:05]</span> <span class="log-warn">[WARN]</span> Ambiguity between arguments [teleport, destination]</div>
+                    <div class="log-entry"><span class="log-time">[14:22:08]</span> <span class="log-info">[INFO]</span> Preparing level "world"</div>
+                    <div class="log-entry"><span class="log-time">[14:22:15]</span> <span class="log-info">[INFO]</span> Time elapsed: 7421 ms</div>
+                    <div class="log-entry"><span class="log-time">[14:22:15]</span> <span class="log-info">[INFO]</span> Done (12.451s)! For help, type "help"</div>
+                </div>
+                <div class="console-box">
+                    <h3>LIFECYCLE EVENTS</h3>
+                    <div class="log-entry"><span class="log-time">10 mins ago</span> Server requested to START by AlexMC</div>
+                    <div class="log-entry"><span class="log-time">9 mins ago</span> Process initialized (PID: 14052)</div>
+                    <div class="log-entry"><span class="log-time">9 mins ago</span> Server marked as RUNNING</div>
+                    <div class="log-entry"><span class="log-time">5 mins ago</span> Bot 'AFK_Helper_1' connected</div>
+                    <div class="log-entry"><span class="log-time">2 mins ago</span> Player 'Steve' joined the game</div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-stats">
+            <span>Total Servers: <strong>4</strong></span>
+            <span>Online: <strong style="color:var(--mc-green-hover)">1</strong></span>
+            <span>Offline: <strong style="color:var(--mc-red-hover)">2</strong></span>
+            <span>Starting: <strong style="color:var(--mc-orange)">1</strong></span>
+            <span>Bots Running: <strong>4</strong></span>
+        </div>
+        <div>
+            Version: <strong>1.5.0-beta</strong>
+        </div>
+    </footer>
+
+</body>
+</html>

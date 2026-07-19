@@ -412,17 +412,13 @@
         function cleanIPAddress(ip) {
             let cleanIp = ip.trim().toLowerCase();
             
+            // If it contains add.aternos. or aternos.me/ or aternos.org/ or is a redirect link, keep it as is so the backend can resolve it
+            if (cleanIp.includes('add.aternos.') || cleanIp.includes('aternos.me/') || cleanIp.includes('aternos.org/')) {
+                return ip.trim();
+            }
+
             // Strip protocols (http://, https://) and www. if entered
             cleanIp = cleanIp.replace(/^(https?:\/\/)?(www\.)?/, '');
-            
-            // Convert add.aternos.org/servername to servername.aternos.me
-            if (cleanIp.startsWith('add.aternos.org/')) {
-                const parts = cleanIp.split('/');
-                const serverName = parts[1];
-                if (serverName) {
-                    return `${serverName}.aternos.me`;
-                }
-            }
             
             return ip.trim();
         }
